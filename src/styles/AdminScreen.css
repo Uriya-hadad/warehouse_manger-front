@@ -1,0 +1,10 @@
+.AdminScreenContainer{
+    display: flex;
+    flex-direction: column;
+
+}
+.adminOptionsContainer{
+    display: flex;
+    gap: 5px;
+    flex-direction: row;
+}

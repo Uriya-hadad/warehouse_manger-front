@@ -1,0 +1,14 @@
+.login-label{
+
+}
+
+
+.login-input{
+    width:8rem;
+    font-family: Aharoni,sans-serif;
+}
+.login-buttons{
+    margin-top: 10px;
+    display: inline-flex;
+    gap: 10px;
+}

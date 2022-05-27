@@ -1,26 +1,35 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, {useState} from 'react';
+import './styles/App.css';
+import {Login} from "./Components/Login";
+import Register from "./Components/Register";
+import Screen from "./Components/Screen";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+type MyState = { isLogin: boolean };
+type MyProps = {};
+
+
+class App extends React.Component<MyProps, MyState> {
+
+    constructor(props: any) {
+        super(props);
+        this.state = {isLogin: false}
+    }
+
+    registerHandler(e: any) {
+        e.preventDefault();
+        this.setState(prevState => ({isLogin: !prevState.isLogin}));
+    }
+
+    render() {
+        const isLogin = this.state.isLogin;
+        return <Screen/>
+        // <div
+
+            // className="login-container">
+            // {isLogin && <Login/>}
+            // {!isLogin && <Register/>}
+            // <a href="#" onClick={this.registerHandler.bind(this)}>Register</a>
+        // </div>
+    }
 }
-
 export default App;
