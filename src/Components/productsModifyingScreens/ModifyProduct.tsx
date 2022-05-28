@@ -3,26 +3,22 @@ import {TextField} from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
 import SendIcon from "@mui/icons-material/Send";
 import {gql, request} from "graphql-request";
-import {Product} from "../Screen";
+
 
 
 type State = {
-    isClicked: boolean,
-    data: boolean
-}
-type props = {
-	changeFunction: (data:Product) => void
+	isClicked: boolean,
+	data: boolean,
 }
 
-class SellInput extends Component<props, State> {
 
-	constructor(props: props) {
+class ModifyProduct extends Component<Record<string, never>, State> {
+	constructor(props: Record<string, never>) {
 		super(props);
 		this.state = {
 			isClicked: false,
 			data: false
 		};
-
 	}
 
 	searchHandler() {
@@ -45,28 +41,40 @@ class SellInput extends Component<props, State> {
 	}
 
 	render() {
-		const isClicked = this.state.isClicked;
 		return (
 			<>
-				<div className="LoadingButtonsContainer">
-					<h1>Insert A Sell</h1>
-					<TextField className="workerTextField" id="nameOfProduct"
-						label="Name Of The Product" variant="filled"/>
-					<TextField className="workerTextField" id="quantity" label="Quantity"
-						variant="filled"/>
-					<LoadingButton
-						size="medium"
-						onClick={this.searchHandler.bind(this)}
-						endIcon={<SendIcon/>}
-						loading={isClicked}
-						loadingPosition="end"
-						variant="contained"
-					>Enter A Sell
-					</LoadingButton>
-				</div>
+				<TextField
+					id="nameOfProduct"
+					label="*Name Of The Product"
+					variant="filled"/>
+				<TextField
+					id="newNameOfProduct"
+					label="New Name"
+					variant="filled"/>
+				<TextField
+					id="newQuantityOfProduct"
+					label="New Quantity"
+					variant="filled"/>
+				<TextField
+					id="newUrlOfProduct"
+					label="New Img Url"
+					variant="filled"/>
+				<TextField
+					id="newSellsNumOfProduct"
+					label="New Number Of Sales"
+					variant="filled"/>
+				<LoadingButton
+					size="medium"
+					onClick={this.searchHandler.bind(this)}
+					endIcon={<SendIcon/>}
+					loading={this.state.isClicked}
+					loadingPosition="end"
+					variant="contained">
+					Change product property
+				</LoadingButton>
 			</>
 		);
 	}
 }
 
-export default SellInput;
+export default ModifyProduct;

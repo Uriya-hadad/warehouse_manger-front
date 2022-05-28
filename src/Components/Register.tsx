@@ -22,7 +22,7 @@ class Register extends Component<Record<string, never>, MyState> {
 			username: username.value,
 			password: password.value
 		}).then((data) => {
-
+			console.log();
 		}).catch(e => {
 			console.log(e);
 		});

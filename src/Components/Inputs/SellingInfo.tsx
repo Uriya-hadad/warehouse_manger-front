@@ -4,6 +4,7 @@ import LoadingButton from "@mui/lab/LoadingButton";
 import SendIcon from "@mui/icons-material/Send";
 import {gql, request} from "graphql-request";
 import "../../styles/SellingInfo.css";
+import {Product} from "../Screen";
 
 
 type State = {
@@ -11,11 +12,13 @@ type State = {
     data: boolean,
     value: number,
 }
+type props = {
+	changeFunction: (data:Product) => void
+}
 
+class SellingInfo extends Component<props, State> {
 
-class SellingInfo extends Component<Record<string, never>, State> {
-
-	constructor(props: Record<string, never>) {
+	constructor(props: props) {
 		super(props);
 		this.state = {
 			isClicked: false,
@@ -24,6 +27,7 @@ class SellingInfo extends Component<Record<string, never>, State> {
 		};
 
 	}
+
 
 	searchHandler() {
 		this.setState(prevState => ({isClicked: !prevState.isClicked}));
@@ -58,7 +62,7 @@ class SellingInfo extends Component<Record<string, never>, State> {
 		return (
 			<>
 				<div className="LoadingButtonsContainer">
-					<h1>Selling Information</h1>
+					<h1>Sale Information</h1>
 					<RadioGroup
 						defaultValue="best"
 						name="radio-buttons-group">
@@ -84,7 +88,7 @@ class SellingInfo extends Component<Record<string, never>, State> {
 						loading={isClicked}
 						loadingPosition="end"
 						variant="contained">
-                        Search Product
+                        Get sales info
 					</LoadingButton>
 				</div>
 			</>

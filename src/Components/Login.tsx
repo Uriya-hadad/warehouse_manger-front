@@ -23,14 +23,13 @@ function change_color(b: boolean) {
 	}
 
 }
-type Props = {}
 
 type State = {
     timeRemainingInSeconds: number;
 }
 
-export class Login extends Component<Props, State>{
-	constructor(props: Props) {
+export class Login extends Component<Record<string, never>, State>{
+	constructor(props:Record<string, never> ) {
 		super(props);
 		this.submitHandler.bind(this);
 		this.clientHandler.bind(this);
