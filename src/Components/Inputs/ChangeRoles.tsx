@@ -81,7 +81,7 @@ class ChangeRoles extends Component<Record<string, never>, State> {
 						</FormControl>
 					</div>
 					<LoadingButton
-						size="medium"
+						size="large"
 						onClick={this.searchHandler.bind(this)}
 						endIcon={<SendIcon/>}
 						loading={isClicked}

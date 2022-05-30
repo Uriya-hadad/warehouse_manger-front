@@ -12,7 +12,7 @@ type State = {
 }
 
 
-class DeleteProduct extends Component<Record<string, never>, State> {
+class ModifyProduct extends Component<Record<string, never>, State> {
 	constructor(props: Record<string, never>) {
 		super(props);
 		this.state = {
@@ -47,18 +47,34 @@ class DeleteProduct extends Component<Record<string, never>, State> {
 					id="nameOfProduct"
 					label="*Name Of The Product"
 					variant="filled"/>
+				<TextField
+					id="newNameOfProduct"
+					label="New Name"
+					variant="filled"/>
+				<TextField
+					id="newQuantityOfProduct"
+					label="New Quantity"
+					variant="filled"/>
+				<TextField
+					id="newUrlOfProduct"
+					label="New Img Url"
+					variant="filled"/>
+				<TextField
+					id="newSellsNumOfProduct"
+					label="New Number Of Sales"
+					variant="filled"/>
 				<LoadingButton
-					size="medium"
+					size="large"
 					onClick={this.searchHandler.bind(this)}
 					endIcon={<SendIcon/>}
 					loading={this.state.isClicked}
 					loadingPosition="end"
 					variant="contained">
-					Delete product
+					Change product property
 				</LoadingButton>
 			</>
 		);
 	}
 }
 
-export default DeleteProduct;
+export default ModifyProduct;

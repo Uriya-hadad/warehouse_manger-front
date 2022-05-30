@@ -12,7 +12,7 @@ type State = {
 	isLoading: boolean,
 	data: boolean,
 	limitValue: number,
-	choice:string
+	choice: string
 }
 type props = {
 	changeFunction: (data: Array<Product>) => void,
@@ -42,7 +42,7 @@ class SellingInfo extends Component<props, State> {
 			isLoading: false,
 			data: false,
 			limitValue: 5,
-			choice:"best"
+			choice: "best"
 		};
 
 	}
@@ -57,8 +57,8 @@ class SellingInfo extends Component<props, State> {
 		this.changeLoadingState();
 		clearData();
 		try {
-			const data = (await request("http://localhost:3001/graphql", worstListQuery,{
-				limit:limitValue
+			const data = (await request("http://localhost:3001/graphql", worstListQuery, {
+				limit: limitValue
 			})).WorstSellingProducts;
 			changeFunction(data);
 		} catch (e) {
@@ -75,8 +75,8 @@ class SellingInfo extends Component<props, State> {
 		this.changeLoadingState();
 		clearData();
 		try {
-			const data = (await request("http://localhost:3001/graphql", bestListQuery,{
-				limit:limitValue
+			const data = (await request("http://localhost:3001/graphql", bestListQuery, {
+				limit: limitValue
 			})).BestSellingProducts;
 			changeFunction(data);
 		} catch (e) {
@@ -94,7 +94,7 @@ class SellingInfo extends Component<props, State> {
 		if (choice == "worst") await this.getWorstList();
 	}
 
-	getChoice(event: React.MouseEvent<HTMLLabelElement>){
+	getChoice(event: React.MouseEvent<HTMLLabelElement>) {
 		const choice = (event.target as HTMLInputElement).value;
 		this.setState({choice});
 	}
@@ -114,8 +114,18 @@ class SellingInfo extends Component<props, State> {
 					<RadioGroup
 						defaultValue="best"
 						name="radio-buttons-group">
-						<FormControlLabel className={"listOptionButton"} value="best" control={<Radio/>} label="Best" onClick={this.getChoice.bind(this)}/>
-						<FormControlLabel className={"listOptionButton"}  value="worst" control={<Radio/>} label="Worst" onClick={this.getChoice.bind(this)}/>
+						<FormControlLabel
+							className={"listOptionButton"}
+							value="best"
+							control={<Radio/>}
+							label={<Typography style={{"fontWeight": "bold"}}>Best</Typography>}
+							onClick={this.getChoice.bind(this)}/>
+						<FormControlLabel
+							className={"listOptionButton"}
+							value="worst"
+							control={<Radio/>}
+							label={<Typography style={{"fontWeight": "bold"}}>Worst</Typography>}
+							onClick={this.getChoice.bind(this)}/>
 					</RadioGroup>
 					<Typography id="non-linear-slider" gutterBottom>
 						Limit result by: {this.state.limitValue}
@@ -130,7 +140,7 @@ class SellingInfo extends Component<props, State> {
 						max={30}
 					/>
 					<LoadingButton
-						size="medium"
+						size="large"
 						onClick={this.fetchData.bind(this)}
 						endIcon={<SendIcon/>}
 						loading={isLoading}

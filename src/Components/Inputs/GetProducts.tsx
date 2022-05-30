@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import {FormControlLabel, Radio, RadioGroup, TextField} from "@mui/material";
+import {FormControlLabel, Radio, RadioGroup, TextField, Typography} from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
 import SendIcon from "@mui/icons-material/Send";
 import {gql, request} from "graphql-request";
@@ -102,14 +102,13 @@ class GetProducts extends Component<props, State> {
 						<FormControlLabel
 							value="one"
 							control={<Radio/>}
-							label="Get One"
+							label={<Typography style={{"fontWeight":"bold"}}>Get One</Typography>}
 							onClick={this.optionsClickHandler.bind(this)}/>
 						<FormControlLabel
-							className={"RadioButton"}
 							onClick={this.optionsClickHandler.bind(this)}
 							value="all"
 							control={<Radio/>}
-							label="Get All"/>
+							label={<Typography style={{"fontWeight":"bold"}}>Get All</Typography>}/>
 					</RadioGroup>
 					<TextField
 						id="nameOfProduct"
@@ -117,7 +116,7 @@ class GetProducts extends Component<props, State> {
 						label="Name Of The Product"
 						variant="filled"/>
 					<LoadingButton
-						size="medium"
+						size="large"
 						onClick={this.fetchData.bind(this)}
 						endIcon={<SendIcon/>}
 						loading={isClicked}

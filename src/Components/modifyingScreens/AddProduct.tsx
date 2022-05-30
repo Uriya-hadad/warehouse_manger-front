@@ -67,7 +67,7 @@ class AddProduct extends Component<props, State> {
 					label="*Quantity"
 					variant="filled"/>
 				<LoadingButton
-					size="medium"
+					size="large"
 					onClick={this.searchHandler.bind(this)}
 					endIcon={<SendIcon/>}
 					loading={this.state.isClicked}

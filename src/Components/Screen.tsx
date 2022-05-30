@@ -106,14 +106,14 @@ export default class Screen extends Component<Record<string, never>, State> {
 		return <div className="ScreensContainer">
 			<div className="OptionsContainer">
 				<LoadingButton
-					size="medium"
+					size="large"
 					onClick={this.selectHandlerAndHideData.bind(this)}
 					loading={isClicked}
 					value="0"
 					variant="contained"
 				>search for Product</LoadingButton>
 				<LoadingButton
-					size="medium"
+					size="large"
 					onClick={this.selectHandlerAndHideData.bind(this)}
 					loading={isClicked}
 					value="1"
@@ -121,14 +121,14 @@ export default class Screen extends Component<Record<string, never>, State> {
 					get the sells list
 				</LoadingButton>
 				<LoadingButton
-					size="medium"
+					size="large"
 					onClick={this.selectHandlerAndHideData.bind(this)}
 					loading={isClicked}
 					variant="contained"
 					value="2"
 				>add/adjust product</LoadingButton>
 				<LoadingButton
-					size="medium"
+					size="large"
 					onClick={this.selectHandlerAndHideData.bind(this)}
 					loading={isClicked}
 					value="3"
@@ -136,7 +136,7 @@ export default class Screen extends Component<Record<string, never>, State> {
 					change roles
 				</LoadingButton>
 				<LoadingButton
-					size="medium"
+					size="large"
 					onClick={this.selectHandlerAndHideData.bind(this)}
 					loading={isClicked}
 					value="4"

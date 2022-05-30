@@ -1,11 +1,11 @@
 import React, {Component} from "react";
-import {FormControlLabel, Radio, RadioGroup} from "@mui/material";
+import {FormControlLabel, Radio, RadioGroup, Typography} from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
 import SendIcon from "@mui/icons-material/Send";
 import {gql, request} from "graphql-request";
-import AddProduct from "../productsModifyingScreens/AddProduct";
-import DeleteProduct from "../productsModifyingScreens/DeleteProduct";
-import ModifyProduct from "../productsModifyingScreens/ModifyProduct";
+import AddProduct from "../modifyingScreens/AddProduct";
+import DeleteProduct from "../modifyingScreens/DeleteProduct";
+import ModifyProduct from "../modifyingScreens/ModifyProduct";
 import {Product} from "../Screen";
 
 
@@ -67,14 +67,14 @@ class ProductModifying extends Component<props, State> {
 							className="options"
 							value="add"
 							control={<Radio/>}
-							label="Add"
+							label={<Typography style={{"fontWeight": "bold"}}>Add</Typography>}
 							labelPlacement="top"
 							onClick={this.optionsClickHandler.bind(this)}/>
 						<FormControlLabel
 							className="options"
 							value="change"
 							control={<Radio/>}
-							label="Change Props"
+							label={<Typography style={{"fontWeight": "bold"}}>Change Props</Typography>}
 							labelPlacement="top"
 							onClick={this.optionsClickHandler.bind(this)}/>
 						<FormControlLabel
@@ -82,7 +82,7 @@ class ProductModifying extends Component<props, State> {
 							onClick={this.optionsClickHandler.bind(this)}
 							value="delete"
 							control={<Radio/>}
-							label="Delete"
+							label={<Typography style={{"fontWeight": "bold"}}>Delete</Typography>}
 							labelPlacement="top"/>
 					</RadioGroup>
 					{addMode && <AddProduct changeFunction={this.props.changeFunction.bind(this)}/>}
