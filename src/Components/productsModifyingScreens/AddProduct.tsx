@@ -11,7 +11,7 @@ type State = {
 	data: boolean,
 }
 type props = {
-	changeFunction: (data:Product) => void
+	changeFunction: (data:Array<Product>) => void
 }
 
 
@@ -42,11 +42,11 @@ class AddProduct extends Component<props, State> {
 		// 	console.log(data);
 		// });
 		
-		this.props.changeFunction(
-			{"name": "apple",
-				"imgSrc": "https://i5.walmartimages.com/asr/f46d4fa7-6108-4450-a610-cc95a1ca28c5_3.38c2c5b2f003a0aafa618f3b4dc3cbbd.jpeg?odnHeight=612&odnWidth=612&odnBg=FFFFFF",
-				"quantity": 5,
-				"numberOfSales": 0});
+		// this.props.changeFunction(
+		// 	{"name": "apple",
+		// 		"imgSrc": "https://i5.walmartimages.com/asr/f46d4fa7-6108-4450-a610-cc95a1ca28c5_3.38c2c5b2f003a0aafa618f3b4dc3cbbd.jpeg?odnHeight=612&odnWidth=612&odnBg=FFFFFF",
+		// 		"quantity": 5,
+		// 		"numberOfSales": 0});
 		this.setState(prevState => ({isClicked: !prevState.isClicked}));
 
 	}

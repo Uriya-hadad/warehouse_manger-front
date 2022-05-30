@@ -1,5 +1,5 @@
-import React, {Component, MouseEventHandler} from "react";
-import {FormControlLabel, Radio, RadioGroup, TextField} from "@mui/material";
+import React, {Component} from "react";
+import {FormControlLabel, Radio, RadioGroup} from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
 import SendIcon from "@mui/icons-material/Send";
 import {gql, request} from "graphql-request";
@@ -17,7 +17,9 @@ type State = {
 }
 
 type props = {
-	changeFunction: (data:Product) => void
+	changeFunction: (data: Array<Product>) => void,
+	changeStateError: (error: string) => void,
+	clearData: () => void
 }
 
 

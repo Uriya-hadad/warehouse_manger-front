@@ -7,7 +7,8 @@ body {
   display: flex;
   background-color: rgb(45, 45, 45);
   justify-content: center;
-  align-items: center;
+  align-items: start;
+  padding-top:10vh;
   min-height: 100vh;
   margin: 0;
 }

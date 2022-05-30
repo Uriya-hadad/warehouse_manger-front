@@ -11,9 +11,10 @@ type State = {
     data: boolean
 }
 type props = {
-	changeFunction: (data:Product) => void
+	changeFunction: (data: Array<Product>) => void,
+	changeStateError: (error: string) => void,
+	clearData: () => void
 }
-
 class SellInput extends Component<props, State> {
 
 	constructor(props: props) {
