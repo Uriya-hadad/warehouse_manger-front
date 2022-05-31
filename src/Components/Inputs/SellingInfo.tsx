@@ -1,11 +1,11 @@
-import React, {Component} from "react";
+import React, {Component, FormEvent} from "react";
 import {FormControlLabel, Radio, RadioGroup, Slider, TextField, Typography} from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
 import SendIcon from "@mui/icons-material/Send";
 import {gql, request} from "graphql-request";
 import "../../styles/SellingInfo.css";
-import {Product} from "../Screen";
-import {jsonParser} from "../../util/jsonParser";
+import {messagesInterface, Product} from "../mainScreens/Screen";
+import {jsonParser} from "../../util/function";
 
 
 type State = {
@@ -16,19 +16,19 @@ type State = {
 }
 type props = {
 	changeFunction: (data: Array<Product>) => void,
-	changeStateError: (error: string) => void,
+	showMessages: (messages: messagesInterface) => void,
 	clearData: () => void
 }
 
 const worstListQuery = gql`
-					query WorstSellingProducts($limit: Int!){
-                			WorstSellingProducts(limit:$limit){
+					query worstSellingProducts($limit: Int!){
+                			worstSellingProducts(limit:$limit){
                 				name, imgSrc,quantity,numberOfSales
                 			}
         			 }`;
 const bestListQuery = gql`
-					query BestSellingProducts($limit: Int!){
-                			BestSellingProducts(limit:$limit){
+					query bestSellingProducts($limit: Int!){
+                			bestSellingProducts(limit:$limit){
                 				name, imgSrc,quantity,numberOfSales
                 			}
         			 }`;
@@ -53,17 +53,17 @@ class SellingInfo extends Component<props, State> {
 
 	async getWorstList() {
 		const limitValue = this.state.limitValue;
-		const {changeFunction, changeStateError, clearData} = this.props;
+		const {changeFunction, showMessages, clearData} = this.props;
 		this.changeLoadingState();
 		clearData();
 		try {
 			const data = (await request("http://localhost:3001/graphql", worstListQuery, {
 				limit: limitValue
-			})).WorstSellingProducts;
+			})).worstSellingProducts;
 			changeFunction(data);
 		} catch (e) {
-			const obj = jsonParser(e as string).response.errors[0].message;
-			changeStateError(obj);
+			const error = jsonParser(e as string).response.errors[0].message;
+			showMessages({error});
 		} finally {
 			this.changeLoadingState();
 		}
@@ -71,23 +71,24 @@ class SellingInfo extends Component<props, State> {
 
 	async getBestList() {
 		const limitValue = this.state.limitValue;
-		const {changeFunction, changeStateError, clearData} = this.props;
+		const {changeFunction, showMessages, clearData} = this.props;
 		this.changeLoadingState();
 		clearData();
 		try {
 			const data = (await request("http://localhost:3001/graphql", bestListQuery, {
 				limit: limitValue
-			})).BestSellingProducts;
+			})).bestSellingProducts;
 			changeFunction(data);
 		} catch (e) {
-			const obj = jsonParser(e as string).response.errors[0].message;
-			changeStateError(obj);
+			const error = jsonParser(e as string).response.errors[0].message;
+			showMessages({error});
 		} finally {
 			this.changeLoadingState();
 		}
 	}
 
-	async fetchData() {
+	async fetchData(e: FormEvent<HTMLFormElement>) {
+		e.preventDefault();
 		(document.querySelector(".data-container") as HTMLDivElement)!.style.display = "none";
 		const choice = this.state.choice;
 		if (choice == "best") await this.getBestList();
@@ -100,7 +101,6 @@ class SellingInfo extends Component<props, State> {
 	}
 
 	render() {
-
 		const handleChange = (event: Event, limitValue: number | number[]) => {
 			if (typeof limitValue === "number") {
 				this.setState({limitValue});
@@ -108,48 +108,46 @@ class SellingInfo extends Component<props, State> {
 		};
 		const isLoading = this.state.isLoading;
 		return (
-			<>
-				<div className="LoadingButtonsContainer">
-					<h1>Sale Information</h1>
-					<RadioGroup
-						defaultValue="best"
-						name="radio-buttons-group">
-						<FormControlLabel
-							className={"listOptionButton"}
-							value="best"
-							control={<Radio/>}
-							label={<Typography style={{"fontWeight": "bold"}}>Best</Typography>}
-							onClick={this.getChoice.bind(this)}/>
-						<FormControlLabel
-							className={"listOptionButton"}
-							value="worst"
-							control={<Radio/>}
-							label={<Typography style={{"fontWeight": "bold"}}>Worst</Typography>}
-							onClick={this.getChoice.bind(this)}/>
-					</RadioGroup>
-					<Typography id="non-linear-slider" gutterBottom>
+			<form onSubmit={this.fetchData.bind(this)} className="LoadingButtonsContainer">
+				<h1>Sale Information</h1>
+				<RadioGroup
+					defaultValue="best"
+					name="radio-buttons-group">
+					<FormControlLabel
+						className={"listOptionButton"}
+						value="best"
+						control={<Radio/>}
+						label={<span className={"boldText"}>Best</span>}
+						onClick={this.getChoice.bind(this)}/>
+					<FormControlLabel
+						className={"listOptionButton"}
+						value="worst"
+						control={<Radio/>}
+						label={<span className={"boldText"}>Worst</span>}
+						onClick={this.getChoice.bind(this)}/>
+				</RadioGroup>
+				<span className={"boldText"}>
 						Limit result by: {this.state.limitValue}
-					</Typography>
-					<Slider
-						id="limitSlider"
-						defaultValue={5}
-						valueLabelDisplay="on"
-						step={1}
-						onChange={handleChange}
-						min={5}
-						max={30}
-					/>
-					<LoadingButton
-						size="large"
-						onClick={this.fetchData.bind(this)}
-						endIcon={<SendIcon/>}
-						loading={isLoading}
-						loadingPosition="end"
-						variant="contained">
-						Get sales info
-					</LoadingButton>
-				</div>
-			</>
+				</span>
+				<Slider
+					id="limitSlider"
+					defaultValue={5}
+					valueLabelDisplay="on"
+					step={1}
+					onChange={handleChange}
+					min={5}
+					max={30}
+				/>
+				<LoadingButton
+					size="large"
+					type={"submit"}
+					endIcon={<SendIcon/>}
+					loading={isLoading}
+					loadingPosition="end"
+					variant="contained">
+					Get sales info
+				</LoadingButton>
+			</form>
 		);
 	}
 }

@@ -1,78 +1,113 @@
-import React,{Component} from "react";
+import React, {Component, FormEvent} from "react";
 import {TextField} from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
 import SendIcon from "@mui/icons-material/Send";
 import {gql, request} from "graphql-request";
-
+import {messagesInterface, Product} from "../mainScreens/Screen";
+import {checkInput, jsonParser} from "../../util/function";
 
 
 type State = {
-	isClicked: boolean,
-	data: boolean,
+	isLoading: boolean,
+}
+type props = {
+	changeFunction: (data: Array<Product>) => void,
+	showMessages: (messages: messagesInterface) => void,
+	clearData: () => void
 }
 
+const modProductQuery = gql`
+             mutation changePropertiesOfProduct($previousName: String!$name: String,$imgSrc:String,$quantity:Int,$numberOfSales:Int){
+			 	changePropertiesOfProduct(previousName:$previousName,name:$name,imgSrc:$imgSrc,quantity:$quantity,numberOfSales:$numberOfSales){
+                	name, imgSrc,quantity,numberOfSales
+                }
+			 }`;
 
-class ModifyProduct extends Component<Record<string, never>, State> {
-	constructor(props: Record<string, never>) {
+class ModifyProduct extends Component<props, State> {
+	constructor(props: props) {
 		super(props);
 		this.state = {
-			isClicked: false,
-			data: false
+			isLoading: false,
 		};
 	}
 
-	searchHandler() {
-		this.setState(prevState => ({isClicked: !prevState.isClicked}));
-		const query = gql`
-             query GetOneProduct($name: String!){
-                GetOneProduct(name:$name){
-                name, imgSrc
-                }
-          } 
-        
-        `;
-		const nameOfProduct: HTMLInputElement = document.querySelector("#b")!;
-		request("http://localhost:3001/graphql", query, {
-			name: nameOfProduct.value
-		}).then((data) => {
-			this.setState(prevState => ({isClicked: !prevState.isClicked}));
-			console.log(data);
-		});
+	private changeLoadingState() {
+		this.setState(prevState => ({isLoading: !prevState.isLoading}));
+	}
+
+
+
+	private async fetchData(e: FormEvent<HTMLFormElement>) {
+		e.preventDefault();
+		this.changeLoadingState();
+		const {changeFunction, showMessages, clearData} = this.props;
+		clearData();
+		const oldName: HTMLInputElement = document.querySelector("#nameOfProduct")!;
+		const newName: HTMLInputElement = document.querySelector("#newNameOfProduct")!;
+		const newNumberOfSales: HTMLInputElement = document.querySelector("#newSellsNumOfProduct")!;
+		const newQuantity: HTMLInputElement = document.querySelector("#newQuantityOfProduct")! || undefined;
+		const newImgSrc: HTMLInputElement = document.querySelector("#newUrlOfProduct")! || undefined;
+		const valid = checkInput([newQuantity.value, newNumberOfSales.value]);
+		if (!valid) {
+			this.changeLoadingState();
+			return showMessages({error: "Quantity and sales number must be a number!"});
+		}
+		try {
+			const data = (await request("http://localhost:3001/graphql", modProductQuery, {
+				previousName: oldName.value,
+				name: newName.value,
+				imgSrc: newImgSrc.value,
+				quantity: parseInt(newQuantity.value),
+				numberOfSales: parseInt(newNumberOfSales.value)
+			})).changePropertiesOfProduct;
+			changeFunction([data]);
+		} catch (e) {
+			const error = jsonParser(e as string).response.errors[0].message;
+			showMessages({error});
+		} finally {
+			this.changeLoadingState();
+		}
 	}
 
 	render() {
 		return (
-			<>
+			<form onSubmit={this.fetchData.bind(this)} className={"form-container"}>
 				<TextField
+					required
+					autoComplete={"off"}
 					id="nameOfProduct"
-					label="*Name Of The Product"
+					label="Name Of The Product"
 					variant="filled"/>
 				<TextField
+					autoComplete={"off"}
 					id="newNameOfProduct"
 					label="New Name"
 					variant="filled"/>
 				<TextField
+					autoComplete={"off"}
 					id="newQuantityOfProduct"
 					label="New Quantity"
 					variant="filled"/>
 				<TextField
+					autoComplete={"off"}
 					id="newUrlOfProduct"
 					label="New Img Url"
 					variant="filled"/>
 				<TextField
+					autoComplete={"off"}
 					id="newSellsNumOfProduct"
 					label="New Number Of Sales"
 					variant="filled"/>
 				<LoadingButton
 					size="large"
-					onClick={this.searchHandler.bind(this)}
+					type={"submit"}
 					endIcon={<SendIcon/>}
-					loading={this.state.isClicked}
+					loading={this.state.isLoading}
 					loadingPosition="end"
 					variant="contained">
 					Change product property
 				</LoadingButton>
-			</>
+			</form>
 		);
 	}
 }

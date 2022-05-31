@@ -30,6 +30,12 @@ h1 {
     box-shadow: 0 2px 3px #000000;
 }
 
+.form-container{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+}
 
 .ScreenContainerInnerContainer {
     display: flex;
@@ -56,7 +62,10 @@ h1 {
     border: 2px solid #7994e0;
     border-radius: 6px;
     display: none;
-    grid-template-columns: 1fr 1fr 1fr;
+    /*grid-template-columns: 1fr 1fr 1fr;*/
+    align-content: center;
+    /*gap: 4px;*/
+    grid-auto-flow: column;
     padding: 25px;
     column-gap: 40px;
     row-gap: 25px;
@@ -84,7 +93,11 @@ h1 {
     box-shadow: 0 2px 2px #000000;
 }
 
-#errorMessage {
+.message {
     font-size: 30px;
     font-style: italic;
+}
+
+.error{
+    color: #81eae7;
 }

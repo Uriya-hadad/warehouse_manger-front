@@ -1,4 +1,4 @@
-import React, {Component} from "react";
+import React, {Component, FormEvent} from "react";
 import {
 	FormControl,
 	MenuItem,
@@ -9,88 +9,99 @@ import LoadingButton from "@mui/lab/LoadingButton";
 import SendIcon from "@mui/icons-material/Send";
 import {gql, request} from "graphql-request";
 import "../../styles/ChangeRoles.css";
+import {messagesInterface} from "../mainScreens/Screen";
+import {jsonParser} from "../../util/function";
 
 type State = {
-	isClicked: boolean,
-	data: boolean,
+	isLoading: boolean,
 	roleChange: string
 }
 
+type props = {
+	showMessages: (messages: messagesInterface) => void,
+	clearData: () => void
+}
 
-class ChangeRoles extends Component<Record<string, never>, State> {
+const changeRoleQuery = gql`
+             mutation changeRole($name: String!,$role: String!){
+                changeRole(username:$name,reqRole:$role){
+                username,role
+                }
+         		 }`;
 
-	constructor(props: Record<string, never>) {
+class ChangeRoles extends Component<props, State> {
+
+	constructor(props: props) {
 		super(props);
 		this.state = {
-			isClicked: false,
-			data: false,
+			isLoading: false,
 			roleChange: "client"
 		};
 
 	}
 
-	searchHandler() {
-		this.setState(prevState => ({isClicked: !prevState.isClicked}));
-		const query = gql`
-             query GetOneProduct($name: String!){
-                GetOneProduct(name:$name){
-                name, imgSrc
-                }
-          } 
-        
-        `;
-		const nameOfProduct: HTMLInputElement = document.querySelector("#b")!;
-		request("http://localhost:3001/graphql", query, {
-			name: nameOfProduct.value
-		}).then((data) => {
-			this.setState(prevState => ({isClicked: !prevState.isClicked}));
-			console.log(data);
-		});
+	changeLoadingState() {
+		this.setState(prevState => ({isLoading: !prevState.isLoading}));
+	}
+
+	async fetchData(e: FormEvent<HTMLFormElement>) {
+		e.preventDefault();
+		const name: HTMLInputElement = document.querySelector("#NameOfUser")!;
+		const role = this.state.roleChange;
+		const {showMessages, clearData} = this.props;
+		this.changeLoadingState();
+		clearData();
+		try {
+			const data = (await request("http://localhost:3001/graphql", changeRoleQuery, {
+				name: name.value, role
+			})).changeRole;
+			const message = `The role "${data.role}" is now assign to ${data.username}`;
+			showMessages({message});
+		} catch (e) {
+			const error = jsonParser(e as string).response.errors[0].message;
+			showMessages({error});
+		} finally {
+			this.changeLoadingState();
+		}
 	}
 
 	roleChangeHandler(e: SelectChangeEvent) {
 		this.setState({roleChange: e.target.value});
 	}
 
-	optionsClickHandler(event: React.MouseEvent<HTMLLabelElement>) {
-		const option = (event.target as HTMLInputElement).value;
-		//TODO
-	}
-
 	render() {
-		// const roleChangeHandler=(e: SelectChangeEvent)=> {
-		// 	this.setState({roleChange: e.target.value});
-		// };
-		const isClicked = this.state.isClicked;
+		const isClicked = this.state.isLoading;
 		return (
-			<>
-				<div className="LoadingButtonsContainer">
-					<h1>Change Role For User</h1>
-					<div className={"roleInputContainer"}>
-						<TextField id="NameOfUser" label="Name Of User" variant="filled"/>
-						<FormControl sx={{m: 2, minWidth: 120}}>
-							<Select
-								value={this.state.roleChange}
-								onChange={this.roleChangeHandler.bind(this)}
-								displayEmpty
-							>
-								<MenuItem value={"Client"}>Client</MenuItem>
-								<MenuItem value={"Worker"}>Worker</MenuItem>
-								<MenuItem value={"Manger"}>Manger</MenuItem>
-							</Select>
-						</FormControl>
-					</div>
-					<LoadingButton
-						size="large"
-						onClick={this.searchHandler.bind(this)}
-						endIcon={<SendIcon/>}
-						loading={isClicked}
-						loadingPosition="end"
-						variant="contained">
-						Send Request
-					</LoadingButton>
+			<form onSubmit={this.fetchData.bind(this)} className="LoadingButtonsContainer">
+				<h1>Assign Role For User</h1>
+				<div className={"roleInputContainer"}>
+					<TextField
+						required
+						autoComplete={"off"}
+						id="NameOfUser"
+						label="Name Of User"
+						variant="filled"/>
+					<FormControl sx={{m: 2, minWidth: 120}}>
+						<Select
+							required
+							onChange={this.roleChangeHandler.bind(this)}
+							displayEmpty>
+							<MenuItem value={"Client"}>Client</MenuItem>
+							<MenuItem value={"Worker"}>Worker</MenuItem>
+							<MenuItem value={"Manger"}>Manger</MenuItem>
+						</Select>
+					</FormControl>
 				</div>
-			</>
+				<LoadingButton
+					size="large"
+					type={"submit"}
+					endIcon={<SendIcon/>}
+					loading={isClicked}
+					loadingPosition="end"
+					variant="contained">
+					Send Request
+				</LoadingButton>
+			</form>
 		);
 	}
 }

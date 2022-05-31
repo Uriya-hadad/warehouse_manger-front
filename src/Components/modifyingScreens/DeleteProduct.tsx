@@ -1,62 +1,82 @@
-import React,{Component} from "react";
+import React, {Component, FormEvent} from "react";
 import {TextField} from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
 import SendIcon from "@mui/icons-material/Send";
 import {gql, request} from "graphql-request";
-
+import {messagesInterface, Product} from "../mainScreens/Screen";
+import {jsonParser} from "../../util/function";
 
 
 type State = {
-	isClicked: boolean,
-	data: boolean,
+	isLoading: boolean,
+}
+type props = {
+	changeFunction: (data: Array<Product>) => void,
+	showMessages: (messages: messagesInterface) => void,
+	clearData: () => void
 }
 
+const deleteProductQuery = gql`
+             mutation deleteAnProduct($name: String!){
+			 	deleteAnProduct(name:$name){
+                	name, imgSrc,quantity,numberOfSales
+                }
+			 }`;
 
-class DeleteProduct extends Component<Record<string, never>, State> {
-	constructor(props: Record<string, never>) {
+class DeleteProduct extends Component<props, State> {
+	constructor(props: props) {
 		super(props);
 		this.state = {
-			isClicked: false,
-			data: false
+			isLoading: false,
 		};
 	}
 
-	searchHandler() {
-		this.setState(prevState => ({isClicked: !prevState.isClicked}));
-		const query = gql`
-             query GetOneProduct($name: String!){
-                GetOneProduct(name:$name){
-                name, imgSrc
-                }
-          } 
-        
-        `;
-		const nameOfProduct: HTMLInputElement = document.querySelector("#b")!;
-		request("http://localhost:3001/graphql", query, {
-			name: nameOfProduct.value
-		}).then((data) => {
-			this.setState(prevState => ({isClicked: !prevState.isClicked}));
-			console.log(data);
-		});
+	changeLoadingState() {
+		this.setState(prevState => ({isLoading: !prevState.isLoading}));
+	}
+
+
+	async fetchData(e: FormEvent<HTMLFormElement>) {
+		e.preventDefault();
+		const {changeFunction, showMessages, clearData} = this.props;
+		const name: HTMLInputElement = document.querySelector("#nameOfProduct")!;
+		this.changeLoadingState();
+		clearData();
+		try {
+			const data = (await request("http://localhost:3001/graphql", deleteProductQuery, {
+				name: name.value
+			})).deleteAnProduct;
+			data.name = "-";
+			data.quantity = "-";
+			data.numberOfSales = "-";
+			changeFunction([data]);
+		} catch (e) {
+			const error = jsonParser(e as string).response.errors[0].message;
+			showMessages({error});
+		} finally {
+			this.changeLoadingState();
+		}
 	}
 
 	render() {
 		return (
-			<>
+			<form onSubmit={this.fetchData.bind(this)} className={"form-container"}>
 				<TextField
+					required
+					autoComplete={"off"}
 					id="nameOfProduct"
-					label="*Name Of The Product"
+					label="Name Of The Product"
 					variant="filled"/>
 				<LoadingButton
 					size="large"
-					onClick={this.searchHandler.bind(this)}
+					type={"submit"}
 					endIcon={<SendIcon/>}
-					loading={this.state.isClicked}
+					loading={this.state.isLoading}
 					loadingPosition="end"
 					variant="contained">
 					Delete product
 				</LoadingButton>
-			</>
+			</form>
 		);
 	}
 }

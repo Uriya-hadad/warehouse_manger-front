@@ -1,24 +1,20 @@
 import React, {Component} from "react";
 import {FormControlLabel, Radio, RadioGroup, Typography} from "@mui/material";
-import LoadingButton from "@mui/lab/LoadingButton";
-import SendIcon from "@mui/icons-material/Send";
-import {gql, request} from "graphql-request";
 import AddProduct from "../modifyingScreens/AddProduct";
 import DeleteProduct from "../modifyingScreens/DeleteProduct";
 import ModifyProduct from "../modifyingScreens/ModifyProduct";
-import {Product} from "../Screen";
+import {messagesInterface, Product} from "../mainScreens/Screen";
 
 
 type State = {
 	addMode: boolean,
 	changeMode: boolean,
 	deleteMode: boolean,
-	data?:Product
 }
 
 type props = {
 	changeFunction: (data: Array<Product>) => void,
-	changeStateError: (error: string) => void,
+	showMessages: (messages: messagesInterface) => void,
 	clearData: () => void
 }
 
@@ -28,7 +24,6 @@ class ProductModifying extends Component<props, State> {
 	constructor(props: props) {
 		super(props);
 		this.state = {
-			data:undefined,
 			addMode: true,
 			changeMode: false,
 			deleteMode: false
@@ -54,11 +49,12 @@ class ProductModifying extends Component<props, State> {
 
 
 	render() {
-		const {addMode, changeMode, deleteMode, data} = this.state;
+		const {addMode, changeMode, deleteMode} = this.state;
+		const {changeFunction,showMessages,clearData} = this.props;
 		return (
 			<>
 				<div className="LoadingButtonsContainer">
-					<h1>Search A Product</h1>
+					<h1>Products Modifying</h1>
 					<RadioGroup
 						defaultValue="add"
 						name="radio-buttons-group"
@@ -85,9 +81,9 @@ class ProductModifying extends Component<props, State> {
 							label={<Typography style={{"fontWeight": "bold"}}>Delete</Typography>}
 							labelPlacement="top"/>
 					</RadioGroup>
-					{addMode && <AddProduct changeFunction={this.props.changeFunction.bind(this)}/>}
-					{deleteMode && <DeleteProduct/>}
-					{changeMode && <ModifyProduct/>}
+					{addMode && <AddProduct changeFunction={changeFunction.bind(this)} showMessages ={showMessages.bind(this)} clearData={clearData.bind(this)}/>}
+					{deleteMode && <DeleteProduct changeFunction={changeFunction.bind(this)} showMessages ={showMessages.bind(this)} clearData={clearData.bind(this)}/>}
+					{changeMode && <ModifyProduct changeFunction={changeFunction.bind(this)} showMessages ={showMessages.bind(this)} clearData={clearData.bind(this)}/>}
 				</div>
 			</>
 		);

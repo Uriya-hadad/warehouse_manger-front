@@ -1,24 +1,24 @@
-import React,{Component} from "react";
+import React, {Component, FormEvent} from "react";
 import {TextField} from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
 import SendIcon from "@mui/icons-material/Send";
 import {gql, request} from "graphql-request";
-import {Product} from "../Screen";
-import {jsonParser} from "../../util/jsonParser";
+import {messagesInterface, Product} from "../mainScreens/Screen";
+import {checkInput, jsonParser} from "../../util/function";
 
 
 type State = {
-    isLoading: boolean,
-    data: boolean
+	isLoading: boolean,
+	data: boolean
 }
 type props = {
 	changeFunction: (data: Array<Product>) => void,
-	changeStateError: (error: string) => void,
+	showMessages: (messages: messagesInterface) => void,
 	clearData: () => void
 }
 const addASellQuery = gql`
-             	mutation MakeASell($name: String!,$number:Int!){
-                	MakeASell(nameOfProduct:$name,numberOfItemsSold: $number){
+             	mutation makeASell($name: String!,$number:Int!){
+                	makeASell(nameOfProduct:$name,numberOfItemsSold: $number){
                 		name, imgSrc,quantity,numberOfSales
                 	}
          		}`;
@@ -33,27 +33,32 @@ class SellInput extends Component<props, State> {
 		};
 	}
 
-	changeLoadingState() {
+	private changeLoadingState() {
 		this.setState(prevState => ({isLoading: !prevState.isLoading}));
 	}
 
-
-	async fetchData() {
-		const {changeFunction, changeStateError, clearData} = this.props;
+	private async fetchData(e: FormEvent<HTMLFormElement>) {
+		e.preventDefault();
 		this.changeLoadingState();
+		const {changeFunction, showMessages, clearData} = this.props;
+		clearData();
 		const nameOfProduct: HTMLInputElement = document.querySelector("#nameOfProduct")!;
 		const numberOfItemsSold: HTMLInputElement = document.querySelector("#quantity")!;
+		const valid = checkInput([numberOfItemsSold.value]);
+		if (!valid) {
+			this.changeLoadingState();
+			return showMessages({error: "Quantity must be a number!"});
+		}
 		const quantity = parseInt(numberOfItemsSold.value);
-		clearData();
 		try {
 			const data = (await request("http://localhost:3001/graphql", addASellQuery, {
-				name:nameOfProduct.value,
-				number:quantity
-			})).MakeASell;
+				name: nameOfProduct.value,
+				number: quantity
+			})).makeASell;
 			changeFunction([data]);
 		} catch (e) {
-			const obj = jsonParser(e as string).response.errors[0].message;
-			changeStateError(obj);
+			const error = jsonParser(e as string).response.errors[0].message;
+			showMessages({error});
 		} finally {
 			this.changeLoadingState();
 		}
@@ -62,26 +67,36 @@ class SellInput extends Component<props, State> {
 	render() {
 		const isLoading = this.state.isLoading;
 		return (
-			<>
-				<div className="LoadingButtonsContainer">
-					<h1>Insert A Sell</h1>
-					<TextField className="workerTextField" id="nameOfProduct"
-						label="Name Of The Product" variant="filled"/>
-					<TextField className="workerTextField" id="quantity" label="Quantity"
-						variant="filled" />
-					<LoadingButton
-						size="large"
-						onClick={this.fetchData.bind(this)}
-						endIcon={<SendIcon/>}
-						loading={isLoading}
-						loadingPosition="end"
-						variant="contained"
-					>Enter A Sell
-					</LoadingButton>
-				</div>
-			</>
+			<form onSubmit={this.fetchData.bind(this)} className="LoadingButtonsContainer">
+				<h1>Insert A Sell</h1>
+				<TextField
+					required
+					autoComplete={"off"}
+					className="workerTextField"
+					id="nameOfProduct"
+					label="Name Of The Product"
+					variant="filled"/>
+				<TextField
+					required
+					autoComplete={"off"}
+					className="workerTextField"
+					id="quantity"
+					label="Quantity"
+					variant="filled"/>
+				<LoadingButton
+					size="large"
+					type={"submit"}
+					endIcon={<SendIcon/>}
+					loading={isLoading}
+					loadingPosition="end"
+					variant="contained"
+				>Enter A Sell
+				</LoadingButton>
+			</form>
 		);
 	}
+
+
 }
 
 export default SellInput;

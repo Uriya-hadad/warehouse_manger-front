@@ -1,12 +1,12 @@
 import React, {Component} from "react";
 import LoadingButton from "@mui/lab/LoadingButton";
-import "../../src/styles/Screen.css";
-import GetProducts from "./Inputs/GetProducts";
-import SellInput from "./Inputs/SellInput";
-import SellingInfo from "./Inputs/SellingInfo";
-import ProductModifying from "./Inputs/ProductModifying";
-import ChangeRoles from "./Inputs/ChangeRoles";
-
+import "../../styles/Screen.css";
+import GetProducts from "../Inputs/GetProducts";
+import SellInput from "../Inputs/SellInput";
+import SellingInfo from "../Inputs/SellingInfo";
+import ProductModifying from "../Inputs/ProductModifying";
+import ChangeRoles from "../Inputs/ChangeRoles";
+import jwtDecode from "jwt-decode";
 
 export interface Product {
 	name: string,
@@ -15,11 +15,20 @@ export interface Product {
 	numberOfSales: number
 }
 
+export interface messagesInterface{
+	message?: string,
+	error?: string
+}
+
 type State = {
 	isClicked: boolean,
 	data?: Array<Product>,
 	select: selection.search,
-	error: string
+	messages?: messagesInterface
+}
+
+type Props={
+	token:string
 }
 
 enum selection {
@@ -30,9 +39,13 @@ enum selection {
 	insertASell
 }
 
-function ShowError(props: { error: string }) {
+function ShowError(props: { messages: messagesInterface }) {
 	(document.querySelector(".data-container") as HTMLDivElement)!.style.display = "flex";
-	return <p id="errorMessage">{props.error}</p>;
+	const {message,error} = props.messages;
+	if (error)
+		return <p className="message error">{error}</p>;
+	else
+		return <p className="message">{message}</p>;
 }
 
 function ShowData(props: { data: Array<Product> }) {
@@ -50,36 +63,35 @@ function ShowData(props: { data: Array<Product> }) {
 	</>;
 }
 
-function GetContent(props: { select: selection, clear: () => void, changeStateError: (error: string) => void, changeFunction: (data: Array<Product>) => void }) {
-	const {select, changeFunction, changeStateError, clear} = props;
+function GetContent(props: { select: selection, clear: () => void, showMessages: (messages: messagesInterface) => void, changeFunction: (data: Array<Product>) => void }) {
+	const {select, changeFunction, showMessages, clear} = props;
 	switch (select) {
 	case selection.search:
-		return <GetProducts changeFunction={changeFunction} changeStateError={changeStateError} clearData={clear}/>;
+		return <GetProducts changeFunction={changeFunction} showMessages={showMessages} clearData={clear}/>;
 	case selection.getList:
-		return <SellingInfo changeFunction={changeFunction} changeStateError={changeStateError} clearData={clear}/>;
+		return <SellingInfo changeFunction={changeFunction} showMessages={showMessages} clearData={clear}/>;
 	case selection.addAdjDelProduct:
-		return <ProductModifying changeFunction={changeFunction} changeStateError={changeStateError} clearData={clear}/>;
+		return <ProductModifying changeFunction={changeFunction} showMessages={showMessages} clearData={clear}/>;
 	case selection.roles:
-		return <ChangeRoles/>;
+		return <ChangeRoles showMessages={showMessages} clearData={clear}/>;
 	case selection.insertASell:
-		return <SellInput changeFunction={changeFunction} changeStateError={changeStateError} clearData={clear}/>;
+		return <SellInput changeFunction={changeFunction} showMessages={showMessages} clearData={clear}/>;
 	}
 }
 
-export default class Screen extends Component<Record<string, never>, State> {
-	constructor(props: Record<string, never>) {
+export default class Screen extends Component<Props, State> {
+	constructor(props: Props) {
 		super(props);
 		this.state = {
 			isClicked: false,
 			data: undefined,
 			select: selection.search,
-			error: ""
 		};
 	}
 
 	clearErrorAndData() {
 		(document.querySelector(".data-container") as HTMLDivElement)!.style.display = "none";
-		this.setState({error: "", data: undefined});
+		this.setState({messages: undefined, data: undefined});
 	}
 
 	changeStateData(data?: Array<Product>) {
@@ -87,22 +99,21 @@ export default class Screen extends Component<Record<string, never>, State> {
 		(document.querySelector(".data-container") as HTMLDivElement)!.style.display = "grid";
 	}
 
-	changeStateError(error: string) {
-		if (error)
-			this.setState({error});
+	showMessages(messages: messagesInterface) {
+		if (messages)
+			this.setState({messages});
 	}
 
 
 	selectHandlerAndHideData(e: any) {
 		(document.querySelector(".data-container") as HTMLDivElement)!.style.display = "none";
-		this.setState({data: undefined});
+		this.setState({messages:undefined,data: undefined});
 		this.setState({select: parseInt(e.target.value)});
 	}
 
 	render() {
-		const {isClicked, data, error} = this.state;
-		if (data)
-			console.log("data");
+		console.log(jwtDecode(this.props.token));
+		const {isClicked, data,messages} = this.state;
 		return <div className="ScreensContainer">
 			<div className="OptionsContainer">
 				<LoadingButton
@@ -147,11 +158,11 @@ export default class Screen extends Component<Record<string, never>, State> {
 			<GetContent
 				select={this.state.select}
 				changeFunction={this.changeStateData.bind(this)}
-				changeStateError={this.changeStateError.bind(this)}
+				showMessages={this.showMessages.bind(this)}
 				clear={this.clearErrorAndData.bind(this)}/>
 			<div className={"data-container"}>
 				{data && <ShowData data={data}/>}
-				{error && <ShowError error={error}/>}
+				{messages && <ShowError messages={messages}/>}
 			</div>
 		</div>;
 

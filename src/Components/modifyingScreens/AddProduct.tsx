@@ -1,81 +1,99 @@
-import React, {Component} from "react";
+import React, {Component, FormEvent} from "react";
 import {TextField} from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
 import SendIcon from "@mui/icons-material/Send";
 import {gql, request} from "graphql-request";
-import {Product} from "../Screen";
+import {messagesInterface, Product} from "../mainScreens/Screen";
+import {checkInput, jsonParser} from "../../util/function";
 
 
 type State = {
-	isClicked: boolean,
-	data: boolean,
+	isLoading: boolean,
 }
 type props = {
-	changeFunction: (data:Array<Product>) => void
+	changeFunction: (data: Array<Product>) => void,
+	showMessages: (messages: messagesInterface) => void,
+	clearData: () => void
 }
 
+const addProductQuery = gql`
+             mutation addAnProduct($name: String!,$imgSrc:String!,$quantity:Int!){
+			 	addAnProduct(name:$name,imgSrc:$imgSrc,quantity:$quantity){
+                	name, imgSrc,quantity,numberOfSales
+                }
+			 }`;
 
 class AddProduct extends Component<props, State> {
 	constructor(props: props) {
 		super(props);
 		this.state = {
-			isClicked: false,
-			data: false
+			isLoading: false,
 		};
 	}
 
-	searchHandler() {
-		this.setState(prevState => ({isClicked: !prevState.isClicked}));
-		// const query = gql`
-		//      query GetOneProduct($name: String!){
-		//         GetOneProduct(name:$name){
-		//         name, imgSrc
-		//         }
-		//   } 
-		//
-		// `;
-		// const nameOfProduct: HTMLInputElement = document.querySelector("#b")!;
-		// request("http://localhost:3001/graphql", query, {
-		// 	name: nameOfProduct.value
-		// }).then((data) => {
-		// 	this.setState(prevState => ({isClicked: !prevState.isClicked}));
-		// 	console.log(data);
-		// });
-		
-		// this.props.changeFunction(
-		// 	{"name": "apple",
-		// 		"imgSrc": "https://i5.walmartimages.com/asr/f46d4fa7-6108-4450-a610-cc95a1ca28c5_3.38c2c5b2f003a0aafa618f3b4dc3cbbd.jpeg?odnHeight=612&odnWidth=612&odnBg=FFFFFF",
-		// 		"quantity": 5,
-		// 		"numberOfSales": 0});
-		this.setState(prevState => ({isClicked: !prevState.isClicked}));
+	private changeLoadingState() {
+		this.setState(prevState => ({isLoading: !prevState.isLoading}));
+	}
 
+	private async fetchData(e: FormEvent<HTMLFormElement>) {
+		e.preventDefault();
+		this.changeLoadingState();
+		const {changeFunction, showMessages, clearData} = this.props;
+		clearData();
+		const name: HTMLInputElement = document.querySelector("#nameOfProduct")!;
+		const quantity: HTMLInputElement = document.querySelector("#quantityOfProduct")!;
+		const imgSrc: HTMLInputElement = document.querySelector("#imgUrlOfProduct")!;
+		const valid = checkInput([quantity.value]);
+		if (!valid) {
+			this.changeLoadingState();
+			return showMessages({error: "Quantity must be a number!"});
+		}
+		try {
+			const data = (await request("http://localhost:3001/graphql", addProductQuery, {
+				name: name.value,
+				imgSrc: imgSrc.value,
+				quantity: parseInt(quantity.value)
+			})).addAnProduct;
+			changeFunction([data]);
+		} catch (e) {
+			const error = jsonParser(e as string).response.errors[0].message;
+			showMessages({error});
+		} finally {
+			this.changeLoadingState();
+		}
 	}
 
 	render() {
 		return (
-			<>
+			<form onSubmit={this.fetchData.bind(this)} className={"form-container"}>
 				<TextField
+					required={true}
+					autoComplete={"off"}
 					id="nameOfProduct"
-					label="*Name Of The Product"
+					label="Name Of The Product"
 					variant="filled"/>
 				<TextField
+					required={true}
+					autoComplete={"off"}
 					id="imgUrlOfProduct"
-					label="*Img Url"
+					label="Img Url"
 					variant="filled"/>
 				<TextField
+					required={true}
+					autoComplete={"off"}
 					id="quantityOfProduct"
-					label="*Quantity"
+					label="Quantity"
 					variant="filled"/>
 				<LoadingButton
+					type={"submit"}
 					size="large"
-					onClick={this.searchHandler.bind(this)}
 					endIcon={<SendIcon/>}
-					loading={this.state.isClicked}
+					loading={this.state.isLoading}
 					loadingPosition="end"
 					variant="contained">
 					Add product
 				</LoadingButton>
-			</>
+			</form>
 		);
 	}
 }

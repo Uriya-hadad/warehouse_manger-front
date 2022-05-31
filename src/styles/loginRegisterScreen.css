@@ -2,6 +2,16 @@
   font-family: 'Roboto', sans-serif;
   box-sizing: border-box;
 }
+#linkText:active,#linkText:link,#linkText:visited,#linkText{
+  transition: color 0.2s ease-in-out;
+  color: #478e99;
+  font-weight: bold;
+  font-size: 30px;
+  text-decoration: none;
+}
+#linkText:hover{
+  color: #4fe8ff;
+}
 
 
 .App {
@@ -11,7 +21,7 @@
 
 
 
-.login-container{
+.app-container{
   background-color: #474d92;
   display: inline-flex;
   flex-direction: column;
@@ -20,5 +30,4 @@
   padding:10px 10px 40px 10px;
   align-items: center;
   box-shadow: 0 0 4px #000000;
-
 }
