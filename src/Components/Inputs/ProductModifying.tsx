@@ -4,6 +4,7 @@ import AddProduct from "../modifyingScreens/AddProduct";
 import DeleteProduct from "../modifyingScreens/DeleteProduct";
 import ModifyProduct from "../modifyingScreens/ModifyProduct";
 import {messagesInterface, Product} from "../mainScreens/Screen";
+import {GraphQLClient} from "graphql-request";
 
 
 type State = {
@@ -15,7 +16,8 @@ type State = {
 type props = {
 	changeFunction: (data: Array<Product>) => void,
 	showMessages: (messages: messagesInterface) => void,
-	clearData: () => void
+	clearData: () => void,
+	graphqlClient:GraphQLClient
 }
 
 
@@ -50,7 +52,7 @@ class ProductModifying extends Component<props, State> {
 
 	render() {
 		const {addMode, changeMode, deleteMode} = this.state;
-		const {changeFunction,showMessages,clearData} = this.props;
+		const {changeFunction,showMessages,clearData,graphqlClient} = this.props;
 		return (
 			<>
 				<div className="LoadingButtonsContainer">
@@ -81,9 +83,9 @@ class ProductModifying extends Component<props, State> {
 							label={<Typography style={{"fontWeight": "bold"}}>Delete</Typography>}
 							labelPlacement="top"/>
 					</RadioGroup>
-					{addMode && <AddProduct changeFunction={changeFunction.bind(this)} showMessages ={showMessages.bind(this)} clearData={clearData.bind(this)}/>}
-					{deleteMode && <DeleteProduct changeFunction={changeFunction.bind(this)} showMessages ={showMessages.bind(this)} clearData={clearData.bind(this)}/>}
-					{changeMode && <ModifyProduct changeFunction={changeFunction.bind(this)} showMessages ={showMessages.bind(this)} clearData={clearData.bind(this)}/>}
+					{addMode && <AddProduct graphqlClient={graphqlClient} changeFunction={changeFunction.bind(this)} showMessages ={showMessages.bind(this)} clearData={clearData.bind(this)}/>}
+					{deleteMode && <DeleteProduct graphqlClient={graphqlClient} changeFunction={changeFunction.bind(this)} showMessages ={showMessages.bind(this)} clearData={clearData.bind(this)}/>}
+					{changeMode && <ModifyProduct graphqlClient={graphqlClient} changeFunction={changeFunction.bind(this)} showMessages ={showMessages.bind(this)} clearData={clearData.bind(this)}/>}
 				</div>
 			</>
 		);

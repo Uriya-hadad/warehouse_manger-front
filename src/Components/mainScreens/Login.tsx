@@ -2,11 +2,12 @@ import React, {Component, FormEvent} from "react";
 import "../../styles/login.css";
 import {
 	request,
-	gql
+	gql, GraphQLClient
 } from "graphql-request";
-import {Button, TextField} from "@mui/material";
+import {TextField} from "@mui/material";
 import LoginIcon from "@mui/icons-material/Login";
 import LoadingButton from "@mui/lab/LoadingButton";
+import {jsonParser} from "../../util/function";
 
 
 type State = {
@@ -15,10 +16,11 @@ type State = {
 }
 
 type props = {
-	setToken: (token:string) => void
+	setToken: (token: string | undefined) => void,
+	graphqlClient:GraphQLClient
 };
 
-const query = gql`
+const loginQuery = gql`
           mutation login($username: String!
                           $password: String!){
                 login(username:$username
@@ -40,24 +42,29 @@ export class Login extends Component<props, State> {
 
 
 	private async fetchRequest(e: FormEvent<HTMLFormElement>) {
-		const {setToken} = this.props;
 		e.preventDefault();
+		this.setState({massage: undefined});
+		const {setToken,graphqlClient} = this.props;
 		this.changeLoadingState();
 		const username: HTMLInputElement = document.querySelector("#username")!;
 		const password: HTMLInputElement = document.querySelector("#password")!;
-
-		const data = (await request("http://localhost:3001/graphql", query, {
-			username: username.value,
-			password: password.value
-		})).login;
-		this.setState({massage: data});
-		if (!data.includes("is"))
+		graphqlClient.setHeader("QueryName","login");
+		try {
+			const data = (await graphqlClient.request( loginQuery, {
+				username: username.value,
+				password: password.value
+			})).login;
 			setToken(data);
-		this.changeLoadingState();
+		} catch (e) {
+			const error = jsonParser(e as string).response.errors[0].message;
+			this.setState({massage: error});
+		} finally {
+			this.changeLoadingState();
+		}
 	}
 
 	render() {
-		const {massage,isLoading} = this.state;
+		const {massage, isLoading} = this.state;
 		return <form className="login-container" onSubmit={this.fetchRequest.bind(this)}>
 			<h1 className="login-title">Login</h1>
 			<TextField

@@ -1,16 +1,16 @@
 *{
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Open Sans', sans-serif;
   box-sizing: border-box;
 }
 #linkText:active,#linkText:link,#linkText:visited,#linkText{
   transition: color 0.2s ease-in-out;
-  color: #478e99;
+  color: #52b5c4;
   font-weight: bold;
   font-size: 30px;
   text-decoration: none;
 }
 #linkText:hover{
-  color: #4fe8ff;
+  color: #23e7ff;
 }
 
 

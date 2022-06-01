@@ -2,7 +2,7 @@ import React, {Component, FormEvent} from "react";
 import {Button, FormControlLabel, Radio, RadioGroup, TextField, Typography} from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
 import SendIcon from "@mui/icons-material/Send";
-import {gql, request} from "graphql-request";
+import {gql, GraphQLClient, request} from "graphql-request";
 import {messagesInterface, Product} from "../mainScreens/Screen";
 import {jsonParser} from "../../util/function";
 
@@ -13,7 +13,8 @@ type State = {
 type props = {
 	changeFunction: (data: Array<Product>) => void,
 	showMessages: (messages: messagesInterface) => void,
-	clearData: () => void
+	clearData: () => void,
+	graphqlClient:GraphQLClient
 }
 const allQuery = gql`
 					{
@@ -58,12 +59,13 @@ class GetProducts extends Component<props, State> {
 	}
 
 	async getOneProduct() {
-		const {changeFunction, showMessages, clearData} = this.props;
+		const {changeFunction, showMessages, clearData,graphqlClient} = this.props;
 		this.changeLoadingState();
 		const nameOfProduct: HTMLInputElement = document.querySelector("#nameOfProduct")!;
 		clearData();
+		graphqlClient.setHeader("QueryName","getOneProduct");
 		try {
-			const data = (await request("http://localhost:3001/graphql", oneQuery, {
+			const data = (await graphqlClient.request( oneQuery, {
 				name: nameOfProduct.value
 			})).getOneProduct;
 			changeFunction([data]);

@@ -2,7 +2,7 @@ import React, {Component, FormEvent} from "react";
 import {TextField} from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
 import SendIcon from "@mui/icons-material/Send";
-import {gql, request} from "graphql-request";
+import {gql, GraphQLClient, request} from "graphql-request";
 import {messagesInterface, Product} from "../mainScreens/Screen";
 import {jsonParser} from "../../util/function";
 
@@ -13,7 +13,8 @@ type State = {
 type props = {
 	changeFunction: (data: Array<Product>) => void,
 	showMessages: (messages: messagesInterface) => void,
-	clearData: () => void
+	clearData: () => void,
+	graphqlClient:GraphQLClient
 }
 
 const deleteProductQuery = gql`
@@ -38,12 +39,13 @@ class DeleteProduct extends Component<props, State> {
 
 	async fetchData(e: FormEvent<HTMLFormElement>) {
 		e.preventDefault();
-		const {changeFunction, showMessages, clearData} = this.props;
+		const {changeFunction, showMessages, clearData,graphqlClient} = this.props;
 		const name: HTMLInputElement = document.querySelector("#nameOfProduct")!;
 		this.changeLoadingState();
 		clearData();
+		graphqlClient.setHeader("QueryName","deleteAnProduct");
 		try {
-			const data = (await request("http://localhost:3001/graphql", deleteProductQuery, {
+			const data = (await graphqlClient.request(deleteProductQuery, {
 				name: name.value
 			})).deleteAnProduct;
 			data.name = "-";

@@ -2,7 +2,7 @@ import React, {Component, FormEvent} from "react";
 import {FormControlLabel, Radio, RadioGroup, Slider, TextField, Typography} from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
 import SendIcon from "@mui/icons-material/Send";
-import {gql, request} from "graphql-request";
+import {gql, GraphQLClient, request} from "graphql-request";
 import "../../styles/SellingInfo.css";
 import {messagesInterface, Product} from "../mainScreens/Screen";
 import {jsonParser} from "../../util/function";
@@ -17,7 +17,8 @@ type State = {
 type props = {
 	changeFunction: (data: Array<Product>) => void,
 	showMessages: (messages: messagesInterface) => void,
-	clearData: () => void
+	clearData: () => void,
+	graphqlClient:GraphQLClient
 }
 
 const worstListQuery = gql`
@@ -53,11 +54,12 @@ class SellingInfo extends Component<props, State> {
 
 	async getWorstList() {
 		const limitValue = this.state.limitValue;
-		const {changeFunction, showMessages, clearData} = this.props;
+		const {changeFunction, showMessages, clearData,graphqlClient} = this.props;
 		this.changeLoadingState();
 		clearData();
+		graphqlClient.setHeader("QueryName","worstSellingProducts");
 		try {
-			const data = (await request("http://localhost:3001/graphql", worstListQuery, {
+			const data = (await graphqlClient.request( worstListQuery, {
 				limit: limitValue
 			})).worstSellingProducts;
 			changeFunction(data);
@@ -71,11 +73,12 @@ class SellingInfo extends Component<props, State> {
 
 	async getBestList() {
 		const limitValue = this.state.limitValue;
-		const {changeFunction, showMessages, clearData} = this.props;
+		const {changeFunction, showMessages, clearData,graphqlClient} = this.props;
 		this.changeLoadingState();
 		clearData();
+		graphqlClient.setHeader("QueryName","bestSellingProducts");
 		try {
-			const data = (await request("http://localhost:3001/graphql", bestListQuery, {
+			const data = (await graphqlClient.request( bestListQuery, {
 				limit: limitValue
 			})).bestSellingProducts;
 			changeFunction(data);

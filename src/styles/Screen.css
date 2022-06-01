@@ -1,8 +1,3 @@
-.screenTitle {
-    font-size: 56px;
-    margin: 0;
-    height: 100%
-}
 
 h1 {
     font-size: 40px;
@@ -13,10 +8,6 @@ h1 {
     font-weight: bold;
 }
 
-.OptionsContainer {
-    display: flex;
-
-}
 
 .LoadingButtonsContainer {
     display: flex;
@@ -37,16 +28,10 @@ h1 {
     align-items: center;
 }
 
-.ScreenContainerInnerContainer {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 11px;
-}
-
 
 .ScreensContainer {
     min-width: 25vw;
+    width: 1050px;
     background-color: #474d92;
     display: inline-flex;
     flex-direction: column;
@@ -61,11 +46,12 @@ h1 {
 .data-container {
     border: 2px solid #7994e0;
     border-radius: 6px;
+    max-width: 70%;
     display: none;
-    /*grid-template-columns: 1fr 1fr 1fr;*/
+    flex-wrap: wrap;
     align-content: center;
-    /*gap: 4px;*/
-    grid-auto-flow: column;
+    justify-content:space-evenly;
+    gap: 4px;
     padding: 25px;
     column-gap: 40px;
     row-gap: 25px;
@@ -73,31 +59,16 @@ h1 {
 
 }
 
-.inner-data-container > img {
-    width: 17vh;
-}
-
-.inner-data-container > h1 {
-    font-size: 140%;
-}
-
-.inner-data-container {
-    border: 1px solid #000000;
-    background-color: #ffffff;
-    border-radius: 6px;
-    width: 20vh;
-    padding: 10px;
+.nameTitleContainer{
+    margin-bottom:5px;
+    width: 100%;
     display: flex;
-    flex-direction: column;
-    justify-content: end;
-    box-shadow: 0 2px 2px #000000;
+    padding: 0 20px;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #000000
 }
-
-.message {
-    font-size: 30px;
-    font-style: italic;
-}
-
-.error{
-    color: #81eae7;
+.nameTitle{
+    color: #000000;
+    font-size:5rem;
 }

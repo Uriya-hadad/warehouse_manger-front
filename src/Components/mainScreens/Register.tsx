@@ -1,9 +1,10 @@
 import React, {ChangeEvent, Component, FormEvent, FormEventHandler} from "react";
 import {Button, TextField} from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-import {gql, request} from "graphql-request";
+import {gql, GraphQLClient, request} from "graphql-request";
 import "../../styles/register.css";
 import LoadingButton from "@mui/lab/LoadingButton";
+import {jsonParser} from "../../util/function";
 
 
 type MyState = {
@@ -14,7 +15,8 @@ type MyState = {
 };
 
 type props = {
-	changeState: () => void
+	changeState: () => void,
+	graphqlClient:GraphQLClient
 }
 
 const registrationQuery = gql`
@@ -40,7 +42,7 @@ class Register extends Component<props, MyState> {
 
 	private async submitHandler(e: FormEvent<HTMLFormElement>) {
 		this.changeLoadingState();
-		const changeState = this.props.changeState;
+		const {changeState,graphqlClient} = this.props;
 		e.preventDefault();
 		const {password, repeatPassword} = this.state;
 		const username: HTMLInputElement = document.querySelector("#username")!;
@@ -48,16 +50,20 @@ class Register extends Component<props, MyState> {
 			this.changeLoadingState();
 			return this.setState({massage: "Enter the same password"});
 		}
-		const data = (await request("http://localhost:3001/graphql", registrationQuery, {
-			username: username.value,
-			password: password
-		})).register;
-		// const data = "user created successfully!";
-		this.setState({massage: data});
-		this.changeLoadingState();
-		if (data.includes("successfully"))
+		graphqlClient.setHeader("QueryName","register");
+		try {
+			const data = (await graphqlClient.request(registrationQuery, {
+				username: username.value,
+				password: password
+			})).register;
+			this.setState({massage: data});
 			setTimeout(changeState, 2000);
-
+		} catch (e) {
+			const error = jsonParser(e as string).response.errors[0].message;
+			this.setState({massage: error});
+		} finally {
+			this.changeLoadingState();
+		}
 	}
 
 	private passwordUpdate(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {

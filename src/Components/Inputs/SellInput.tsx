@@ -2,7 +2,7 @@ import React, {Component, FormEvent} from "react";
 import {TextField} from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
 import SendIcon from "@mui/icons-material/Send";
-import {gql, request} from "graphql-request";
+import {gql, GraphQLClient, request} from "graphql-request";
 import {messagesInterface, Product} from "../mainScreens/Screen";
 import {checkInput, jsonParser} from "../../util/function";
 
@@ -14,7 +14,8 @@ type State = {
 type props = {
 	changeFunction: (data: Array<Product>) => void,
 	showMessages: (messages: messagesInterface) => void,
-	clearData: () => void
+	clearData: () => void,
+	graphqlClient:GraphQLClient
 }
 const addASellQuery = gql`
              	mutation makeASell($name: String!,$number:Int!){
@@ -40,7 +41,7 @@ class SellInput extends Component<props, State> {
 	private async fetchData(e: FormEvent<HTMLFormElement>) {
 		e.preventDefault();
 		this.changeLoadingState();
-		const {changeFunction, showMessages, clearData} = this.props;
+		const {changeFunction, showMessages, clearData,graphqlClient} = this.props;
 		clearData();
 		const nameOfProduct: HTMLInputElement = document.querySelector("#nameOfProduct")!;
 		const numberOfItemsSold: HTMLInputElement = document.querySelector("#quantity")!;
@@ -50,8 +51,9 @@ class SellInput extends Component<props, State> {
 			return showMessages({error: "Quantity must be a number!"});
 		}
 		const quantity = parseInt(numberOfItemsSold.value);
+		graphqlClient.setHeader("QueryName","makeASell");
 		try {
-			const data = (await request("http://localhost:3001/graphql", addASellQuery, {
+			const data = (await graphqlClient.request( addASellQuery, {
 				name: nameOfProduct.value,
 				number: quantity
 			})).makeASell;

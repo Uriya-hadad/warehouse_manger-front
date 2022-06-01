@@ -1,12 +1,16 @@
 import React, {Component} from "react";
-import LoadingButton from "@mui/lab/LoadingButton";
 import "../../styles/Screen.css";
-import GetProducts from "../Inputs/GetProducts";
-import SellInput from "../Inputs/SellInput";
-import SellingInfo from "../Inputs/SellingInfo";
-import ProductModifying from "../Inputs/ProductModifying";
-import ChangeRoles from "../Inputs/ChangeRoles";
 import jwtDecode from "jwt-decode";
+import {
+	GetContent,
+	GetTiles,
+	ShowData,
+	ShowError
+} from "../../util/ScreenFunctions";
+import LoadingButton from "@mui/lab/LoadingButton";
+import {ThemeProvider} from "@mui/material";
+import {GraphQLClient} from "graphql-request";
+import {createGraphqlClient} from "../../util/function";
 
 export interface Product {
 	name: string,
@@ -15,23 +19,34 @@ export interface Product {
 	numberOfSales: number
 }
 
-export interface messagesInterface{
+export type messagesInterface = {
 	message?: string,
 	error?: string
 }
 
 type State = {
-	isClicked: boolean,
+	graphqlClient: GraphQLClient,
+	role: string,
+	username: string,
 	data?: Array<Product>,
 	select: selection.search,
 	messages?: messagesInterface
 }
-
-type Props={
-	token:string
+type tokenType = {
+	user: {
+		id: number,
+		username: string,
+		password: string,
+		role: string
+	}
 }
 
-enum selection {
+type Props = {
+	token: string,
+	setToken: (token: string | undefined) => void
+}
+
+export enum selection {
 	search,
 	getList,
 	addAdjDelProduct,
@@ -39,51 +54,16 @@ enum selection {
 	insertASell
 }
 
-function ShowError(props: { messages: messagesInterface }) {
-	(document.querySelector(".data-container") as HTMLDivElement)!.style.display = "flex";
-	const {message,error} = props.messages;
-	if (error)
-		return <p className="message error">{error}</p>;
-	else
-		return <p className="message">{message}</p>;
-}
-
-function ShowData(props: { data: Array<Product> }) {
-	const data = props.data;
-	return <>
-		{data.map((item: Product, key) => {
-			const {name, imgSrc, quantity, numberOfSales} = item;
-			return<div key={key} className={"inner-data-container"}>
-				<img src={imgSrc} alt="image"/>
-				<h1>{name}</h1>
-				<h1>quantity: {quantity}</h1>
-				<h1>sales: {numberOfSales}</h1>
-			</div>;
-		})}
-	</>;
-}
-
-function GetContent(props: { select: selection, clear: () => void, showMessages: (messages: messagesInterface) => void, changeFunction: (data: Array<Product>) => void }) {
-	const {select, changeFunction, showMessages, clear} = props;
-	switch (select) {
-	case selection.search:
-		return <GetProducts changeFunction={changeFunction} showMessages={showMessages} clearData={clear}/>;
-	case selection.getList:
-		return <SellingInfo changeFunction={changeFunction} showMessages={showMessages} clearData={clear}/>;
-	case selection.addAdjDelProduct:
-		return <ProductModifying changeFunction={changeFunction} showMessages={showMessages} clearData={clear}/>;
-	case selection.roles:
-		return <ChangeRoles showMessages={showMessages} clearData={clear}/>;
-	case selection.insertASell:
-		return <SellInput changeFunction={changeFunction} showMessages={showMessages} clearData={clear}/>;
-	}
-}
-
 export default class Screen extends Component<Props, State> {
 	constructor(props: Props) {
 		super(props);
+		const {token} = this.props;
+		const {user: {role, username}} = (jwtDecode(token) as tokenType);
+		const graphqlClient = createGraphqlClient(token);
 		this.state = {
-			isClicked: false,
+			graphqlClient,
+			username,
+			role,
 			data: undefined,
 			select: selection.search,
 		};
@@ -96,7 +76,7 @@ export default class Screen extends Component<Props, State> {
 
 	changeStateData(data?: Array<Product>) {
 		this.setState({data});
-		(document.querySelector(".data-container") as HTMLDivElement)!.style.display = "grid";
+		(document.querySelector(".data-container") as HTMLDivElement)!.style.display = "flex";
 	}
 
 	showMessages(messages: messagesInterface) {
@@ -104,61 +84,34 @@ export default class Screen extends Component<Props, State> {
 			this.setState({messages});
 	}
 
+	private logOut() {
+		this.props.setToken(undefined);
+	}
 
-	selectHandlerAndHideData(e: any) {
+	selectHandlerAndHideData(e: React.MouseEvent<HTMLButtonElement>) {
 		(document.querySelector(".data-container") as HTMLDivElement)!.style.display = "none";
-		this.setState({messages:undefined,data: undefined});
-		this.setState({select: parseInt(e.target.value)});
+		this.setState({messages: undefined, data: undefined});
+		this.setState({select: parseInt((e.target as HTMLButtonElement).value)});
 	}
 
 	render() {
-		console.log(jwtDecode(this.props.token));
-		const {isClicked, data,messages} = this.state;
+		const {data, messages,role, username,graphqlClient} = this.state;
 		return <div className="ScreensContainer">
-			<div className="OptionsContainer">
+			<div className={"nameTitleContainer"}>
+				<h1 className={"nameTitle"}>Hi {username}!</h1>
 				<LoadingButton
-					size="large"
-					onClick={this.selectHandlerAndHideData.bind(this)}
-					loading={isClicked}
-					value="0"
-					variant="contained"
-				>search for Product</LoadingButton>
-				<LoadingButton
-					size="large"
-					onClick={this.selectHandlerAndHideData.bind(this)}
-					loading={isClicked}
-					value="1"
+					onClick={this.logOut.bind(this)}
+					sx={{backgroundColor: "#ff9e37", "&:hover": {backgroundColor: "#f8ac5b"}}}
 					variant="contained">
-					get the sells list
-				</LoadingButton>
-				<LoadingButton
-					size="large"
-					onClick={this.selectHandlerAndHideData.bind(this)}
-					loading={isClicked}
-					variant="contained"
-					value="2"
-				>add/adjust product</LoadingButton>
-				<LoadingButton
-					size="large"
-					onClick={this.selectHandlerAndHideData.bind(this)}
-					loading={isClicked}
-					value="3"
-					variant="contained">
-					change roles
-				</LoadingButton>
-				<LoadingButton
-					size="large"
-					onClick={this.selectHandlerAndHideData.bind(this)}
-					loading={isClicked}
-					value="4"
-					variant="contained">
-					insert a sell
+					LogOUt
 				</LoadingButton>
 			</div>
+			<GetTiles role={role}  handler={this.selectHandlerAndHideData.bind(this)}/>
 			<GetContent
 				select={this.state.select}
 				changeFunction={this.changeStateData.bind(this)}
 				showMessages={this.showMessages.bind(this)}
+				graphqlClient={graphqlClient}
 				clear={this.clearErrorAndData.bind(this)}/>
 			<div className={"data-container"}>
 				{data && <ShowData data={data}/>}
@@ -169,4 +122,3 @@ export default class Screen extends Component<Props, State> {
 
 	}
 }
-

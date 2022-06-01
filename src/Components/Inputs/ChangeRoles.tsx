@@ -7,7 +7,7 @@ import {
 } from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
 import SendIcon from "@mui/icons-material/Send";
-import {gql, request} from "graphql-request";
+import {gql, GraphQLClient, request} from "graphql-request";
 import "../../styles/ChangeRoles.css";
 import {messagesInterface} from "../mainScreens/Screen";
 import {jsonParser} from "../../util/function";
@@ -19,7 +19,8 @@ type State = {
 
 type props = {
 	showMessages: (messages: messagesInterface) => void,
-	clearData: () => void
+	clearData: () => void,
+	graphqlClient:GraphQLClient
 }
 
 const changeRoleQuery = gql`
@@ -46,13 +47,14 @@ class ChangeRoles extends Component<props, State> {
 
 	async fetchData(e: FormEvent<HTMLFormElement>) {
 		e.preventDefault();
+		const {showMessages, clearData,graphqlClient} = this.props;
 		const name: HTMLInputElement = document.querySelector("#NameOfUser")!;
 		const role = this.state.roleChange;
-		const {showMessages, clearData} = this.props;
 		this.changeLoadingState();
 		clearData();
+		graphqlClient.setHeader("QueryName","changeRole");
 		try {
-			const data = (await request("http://localhost:3001/graphql", changeRoleQuery, {
+			const data = (await graphqlClient.request( changeRoleQuery, {
 				name: name.value, role
 			})).changeRole;
 			const message = `The role "${data.role}" is now assign to ${data.username}`;
