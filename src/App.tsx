@@ -1,13 +1,8 @@
-import React, {MouseEventHandler, useState} from "react";
+import React from "react";
 import Screen from "./Components/mainScreens/Screen";
 import LoginRegisterScreen from "./Components/mainScreens/LoginRegisterScreen";
 
 type MyState = { token?: string };
-
-type props = {
-	setToken: (token:string) => void
-};
-
 class App extends React.Component<Record<string, never>, MyState> {
 
 	constructor(props: Record<string, never>) {

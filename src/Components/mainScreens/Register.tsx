@@ -1,7 +1,7 @@
-import React, {ChangeEvent, Component, FormEvent, FormEventHandler} from "react";
-import {Button, TextField} from "@mui/material";
+import React, {ChangeEvent, Component, FormEvent} from "react";
+import {TextField} from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-import {gql, GraphQLClient, request} from "graphql-request";
+import {gql, GraphQLClient} from "graphql-request";
 import "../../styles/register.css";
 import LoadingButton from "@mui/lab/LoadingButton";
 import {jsonParser} from "../../util/function";

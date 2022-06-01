@@ -8,7 +8,6 @@ import {
 	ShowError
 } from "../../util/ScreenFunctions";
 import LoadingButton from "@mui/lab/LoadingButton";
-import {ThemeProvider} from "@mui/material";
 import {GraphQLClient} from "graphql-request";
 import {createGraphqlClient} from "../../util/function";
 

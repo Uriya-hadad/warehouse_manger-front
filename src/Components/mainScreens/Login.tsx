@@ -1,8 +1,6 @@
 import React, {Component, FormEvent} from "react";
 import "../../styles/login.css";
-import {
-	request,
-	gql, GraphQLClient
+import {gql, GraphQLClient
 } from "graphql-request";
 import {TextField} from "@mui/material";
 import LoginIcon from "@mui/icons-material/Login";

@@ -2,7 +2,7 @@ import React, {Component, FormEvent} from "react";
 import {TextField} from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
 import SendIcon from "@mui/icons-material/Send";
-import {gql, GraphQLClient, request} from "graphql-request";
+import {gql, GraphQLClient} from "graphql-request";
 import {messagesInterface, Product} from "../mainScreens/Screen";
 import {jsonParser} from "../../util/function";
 
