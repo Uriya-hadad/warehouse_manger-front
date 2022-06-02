@@ -16,7 +16,7 @@ export function checkInput(values: string[]) {
 }
 
 export function createGraphqlClient(token?: string) {
-	const endpoint = process.env.DB_URL || "https://super-market-storage.herokuapp.com/server1";
+	const endpoint = process.env.DB_URL;
 	console.log(endpoint);
 	return new GraphQLClient(endpoint, {headers: {Authorization: "Bearer " + token}});
 }
