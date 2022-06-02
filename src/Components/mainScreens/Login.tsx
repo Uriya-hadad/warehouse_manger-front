@@ -77,6 +77,7 @@ export class Login extends Component<props, State> {
 				color="success"
 				placeholder="Password"
 				className="login-input"
+				autoComplete="on"
 				id="password"
 				type="password"
 				variant="standard"/>
