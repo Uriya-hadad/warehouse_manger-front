@@ -58,6 +58,7 @@ export default class Screen extends Component<Props, State> {
 		super(props);
 		const {token} = this.props;
 		const {user: {role, username}} = (jwtDecode(token) as tokenType);
+
 		const graphqlClient = createGraphqlClient(token);
 		this.state = {
 			graphqlClient,
@@ -95,9 +96,10 @@ export default class Screen extends Component<Props, State> {
 
 	render() {
 		const {data, messages,role, username,graphqlClient} = this.state;
+		const usernameFormatted = username.charAt(0).toUpperCase() + username.slice(1).toLowerCase();
 		return <div className="ScreensContainer">
 			<div className={"nameTitleContainer"}>
-				<h1 className={"nameTitle"}>Hi {username}!</h1>
+				<h1 className={"nameTitle"}>Hi {usernameFormatted}!</h1>
 				<LoadingButton
 					onClick={this.logOut.bind(this)}
 					sx={{backgroundColor: "#ff9e37", "&:hover": {backgroundColor: "#f8ac5b"}}}
