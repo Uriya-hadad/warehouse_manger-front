@@ -30,6 +30,7 @@
             "error",
             "double"
         ],
+        "@typescript-eslint/no-non-null-assertion": "off",
         "semi": [
             "error",
             "always"
