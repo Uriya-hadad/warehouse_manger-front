@@ -17,6 +17,7 @@ class App extends React.Component<Record<string, never>, MyState> {
 	}
 
 	render() {
+		console.log(process.env.REACT_APP_DB_URL);
 		const {token} = this.state;
 		return <>
 			{!token && <LoginRegisterScreen setToken={this.setToken.bind(this)}/>}

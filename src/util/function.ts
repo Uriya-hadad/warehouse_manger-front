@@ -16,6 +16,6 @@ export function checkInput(values: string[]) {
 }
 
 export function createGraphqlClient(token?: string) {
-	const endpoint = process.env.DB_URL!;
+	const endpoint = process.env.REACT_APP_DB_URL!;
 	return new GraphQLClient(endpoint, {headers: {Authorization: "Bearer " + token}});
 }
