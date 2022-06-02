@@ -51,7 +51,6 @@ class SellInput extends Component<props, State> {
 			return showMessages({error: "Quantity must be a number!"});
 		}
 		const quantity = parseInt(numberOfItemsSold.value);
-		graphqlClient.setHeader("QueryName","makeASell");
 		try {
 			const data = (await graphqlClient.request( addASellQuery, {
 				name: nameOfProduct.value,

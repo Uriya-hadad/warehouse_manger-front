@@ -50,7 +50,6 @@ class Register extends Component<props, MyState> {
 			this.changeLoadingState();
 			return this.setState({massage: "Enter the same password"});
 		}
-		graphqlClient.setHeader("QueryName","register");
 		try {
 			const data = (await graphqlClient.request(registrationQuery, {
 				username: username.value,

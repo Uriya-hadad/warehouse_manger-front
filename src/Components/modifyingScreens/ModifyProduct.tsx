@@ -53,7 +53,6 @@ class ModifyProduct extends Component<props, State> {
 			this.changeLoadingState();
 			return showMessages({error: "Quantity and sales number must be a number!"});
 		}
-		graphqlClient.setHeader("QueryName","changePropertiesOfProduct");
 		try {
 			const data = (await graphqlClient.request( modProductQuery, {
 				previousName: oldName.value,

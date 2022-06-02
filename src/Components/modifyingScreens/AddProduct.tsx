@@ -49,7 +49,6 @@ class AddProduct extends Component<props, State> {
 			this.changeLoadingState();
 			return showMessages({error: "Quantity must be a number!"});
 		}
-		graphqlClient.setHeader("QueryName","addAnProduct");
 		try {
 			const data = (await graphqlClient.request(addProductQuery , {
 				name: name.value,

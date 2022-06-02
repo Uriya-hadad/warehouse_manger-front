@@ -57,7 +57,6 @@ class SellingInfo extends Component<props, State> {
 		const {changeFunction, showMessages, clearData,graphqlClient} = this.props;
 		this.changeLoadingState();
 		clearData();
-		graphqlClient.setHeader("QueryName","worstSellingProducts");
 		try {
 			const data = (await graphqlClient.request( worstListQuery, {
 				limit: limitValue
@@ -76,7 +75,6 @@ class SellingInfo extends Component<props, State> {
 		const {changeFunction, showMessages, clearData,graphqlClient} = this.props;
 		this.changeLoadingState();
 		clearData();
-		graphqlClient.setHeader("QueryName","bestSellingProducts");
 		try {
 			const data = (await graphqlClient.request( bestListQuery, {
 				limit: limitValue

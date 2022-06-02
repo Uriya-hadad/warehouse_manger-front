@@ -44,11 +44,11 @@ class GetProducts extends Component<props, State> {
 	}
 
 	async getAllProduct() {
-		const {changeFunction, showMessages, clearData} = this.props;
+		const {changeFunction, showMessages, clearData,graphqlClient} = this.props;
 		this.changeLoadingState();
 		clearData();
 		try {
-			const data = (await request("http://localhost:3001/graphql", allQuery)).getAllProducts;
+			const data = (await graphqlClient.request(allQuery)).getAllProducts;
 			changeFunction(data);
 		} catch (e) {
 			const error = jsonParser(e as string).response.errors[0].message;
@@ -63,7 +63,6 @@ class GetProducts extends Component<props, State> {
 		this.changeLoadingState();
 		const nameOfProduct: HTMLInputElement = document.querySelector("#nameOfProduct")!;
 		clearData();
-		graphqlClient.setHeader("QueryName","getOneProduct");
 		try {
 			const data = (await graphqlClient.request( oneQuery, {
 				name: nameOfProduct.value

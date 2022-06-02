@@ -43,7 +43,6 @@ class DeleteProduct extends Component<props, State> {
 		const name: HTMLInputElement = document.querySelector("#nameOfProduct")!;
 		this.changeLoadingState();
 		clearData();
-		graphqlClient.setHeader("QueryName","deleteAnProduct");
 		try {
 			const data = (await graphqlClient.request(deleteProductQuery, {
 				name: name.value

@@ -52,7 +52,6 @@ class ChangeRoles extends Component<props, State> {
 		const role = this.state.roleChange;
 		this.changeLoadingState();
 		clearData();
-		graphqlClient.setHeader("QueryName","changeRole");
 		try {
 			const data = (await graphqlClient.request( changeRoleQuery, {
 				name: name.value, role

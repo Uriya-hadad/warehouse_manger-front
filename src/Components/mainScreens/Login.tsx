@@ -46,7 +46,6 @@ export class Login extends Component<props, State> {
 		this.changeLoadingState();
 		const username: HTMLInputElement = document.querySelector("#username")!;
 		const password: HTMLInputElement = document.querySelector("#password")!;
-		graphqlClient.setHeader("QueryName","login");
 		try {
 			const data = (await graphqlClient.request( loginQuery, {
 				username: username.value,
