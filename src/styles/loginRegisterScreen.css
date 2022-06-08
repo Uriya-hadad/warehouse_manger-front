@@ -1,7 +1,4 @@
-*{
-  font-family: 'Open Sans', sans-serif;
-  box-sizing: border-box;
-}
+
 #linkText:active,#linkText:link,#linkText:visited,#linkText{
   transition: color 0.2s ease-in-out;
   color: #52b5c4;

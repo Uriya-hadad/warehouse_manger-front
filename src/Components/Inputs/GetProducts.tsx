@@ -1,8 +1,8 @@
 import React, {Component, FormEvent} from "react";
-import {FormControlLabel, Radio, RadioGroup, TextField, Typography} from "@mui/material";
+import {FormControlLabel, Radio, RadioGroup, TextField} from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
 import SendIcon from "@mui/icons-material/Send";
-import {gql, GraphQLClient, request} from "graphql-request";
+import {gql, GraphQLClient} from "graphql-request";
 import {messagesInterface, Product} from "../mainScreens/Screen";
 import {jsonParser} from "../../util/function";
 
@@ -11,10 +11,11 @@ type State = {
 	value: string
 }
 type props = {
+	timeOutExecutor: () => void
 	changeFunction: (data: Array<Product>) => void,
 	showMessages: (messages: messagesInterface) => void,
 	clearData: () => void,
-	graphqlClient:GraphQLClient
+	graphqlClient: GraphQLClient
 }
 const allQuery = gql`
 					{
@@ -23,8 +24,8 @@ const allQuery = gql`
 						}
 					}`;
 const oneQuery = gql`
-             query getOneProduct($name: String!){
-                getOneProduct(name:$name){
+             query searchForProducts($name: String!){
+                searchForProducts(name:$name){
                 name, imgSrc,quantity,numberOfSales
                 }
          		 }`;
@@ -43,33 +44,50 @@ class GetProducts extends Component<props, State> {
 		this.setState(prevState => ({isLoading: !prevState.isLoading}));
 	}
 
-	async getAllProduct() {
-		const {changeFunction, showMessages, clearData,graphqlClient} = this.props;
+	async getAllProducts() {
+		const {
+			changeFunction,
+			showMessages,
+			clearData,
+			graphqlClient,
+			timeOutExecutor
+		} = this.props;
 		this.changeLoadingState();
 		clearData();
 		try {
 			const data = (await graphqlClient.request(allQuery)).getAllProducts;
 			changeFunction(data);
 		} catch (e) {
-			const error = jsonParser(e as string).response.errors[0].message;
-			showMessages({error});
+			const errorFormatted = jsonParser(e as string);
+			if (errorFormatted.response.status === 403) {
+				timeOutExecutor();
+			} else {
+				const error = errorFormatted.response.errors[0].message;
+				showMessages({error});
+			}
 		} finally {
 			this.changeLoadingState();
 		}
 	}
 
-	async getOneProduct() {
-		const {changeFunction, showMessages, clearData,graphqlClient} = this.props;
+	async searchForProducts() {
+		const {
+			changeFunction,
+			showMessages,
+			clearData,
+			graphqlClient
+		} = this.props;
 		this.changeLoadingState();
 		const nameOfProduct: HTMLInputElement = document.querySelector("#nameOfProduct")!;
 		clearData();
 		try {
-			const data = (await graphqlClient.request( oneQuery, {
+			const data = (await graphqlClient.request(oneQuery, {
 				name: nameOfProduct.value
-			})).getOneProduct;
-			changeFunction([data]);
+			}));
+			changeFunction(data.searchForProducts);
 		} catch (e) {
-			const error = jsonParser(e as string).response.errors[0].message;
+			const errorFormatted = jsonParser(e as string);
+			const error = errorFormatted.response.errors[0].message;
 			showMessages({error});
 		} finally {
 			this.changeLoadingState();
@@ -79,8 +97,8 @@ class GetProducts extends Component<props, State> {
 	async fetchData(e: FormEvent<HTMLFormElement>) {
 		e.preventDefault();
 		const {value} = this.state;
-		if (value == "one") await this.getOneProduct();
-		if (value == "all") await this.getAllProduct();
+		if (value == "one") await this.searchForProducts();
+		if (value == "all") await this.getAllProducts();
 	}
 
 	optionsClickHandler(event: React.MouseEvent<HTMLLabelElement>) {
@@ -95,7 +113,7 @@ class GetProducts extends Component<props, State> {
 		const isClicked = this.state.isLoading;
 		return (
 			<form onSubmit={this.fetchData.bind(this)} className="LoadingButtonsContainer">
-				<h1>Search A Product</h1>
+				<h1>Get Products</h1>
 				<RadioGroup
 					id="optionChoice"
 					defaultValue="one"
@@ -103,14 +121,14 @@ class GetProducts extends Component<props, State> {
 					<FormControlLabel
 						value="one"
 						control={<Radio/>}
-						label={<Typography style={{"fontWeight": "bold"}}>Get One</Typography>}
+						label={<span className={"boldText"}>Search By Value</span>}
 						onClick={this.optionsClickHandler.bind(this)}/>
 					<FormControlLabel
 						onClick={this.optionsClickHandler.bind(this)}
 						value="all"
 						control={<Radio/>}
-						label={<Typography style={{"fontWeight": "bold"}}>Get
-							All</Typography>}/>
+						label={<span className={"boldText"}>Get
+							All</span>}/>
 				</RadioGroup>
 				<TextField
 					autoComplete={"off"}

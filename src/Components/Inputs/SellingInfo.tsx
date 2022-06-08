@@ -15,6 +15,7 @@ type State = {
 	choice: string
 }
 type props = {
+	timeOutExecutor: () => void
 	changeFunction: (data: Array<Product>) => void,
 	showMessages: (messages: messagesInterface) => void,
 	clearData: () => void,
@@ -54,7 +55,7 @@ class SellingInfo extends Component<props, State> {
 
 	async getWorstList() {
 		const limitValue = this.state.limitValue;
-		const {changeFunction, showMessages, clearData,graphqlClient} = this.props;
+		const {changeFunction, showMessages, clearData,graphqlClient,timeOutExecutor} = this.props;
 		this.changeLoadingState();
 		clearData();
 		try {
@@ -63,8 +64,13 @@ class SellingInfo extends Component<props, State> {
 			})).worstSellingProducts;
 			changeFunction(data);
 		} catch (e) {
-			const error = jsonParser(e as string).response.errors[0].message;
-			showMessages({error});
+			const errorFormatted = jsonParser(e as string);
+			if (errorFormatted.response.status === 403) {
+				timeOutExecutor();
+			} else {
+				const error = errorFormatted.response.errors[0].message;
+				showMessages({error});
+			}
 		} finally {
 			this.changeLoadingState();
 		}
@@ -72,7 +78,7 @@ class SellingInfo extends Component<props, State> {
 
 	async getBestList() {
 		const limitValue = this.state.limitValue;
-		const {changeFunction, showMessages, clearData,graphqlClient} = this.props;
+		const {changeFunction, showMessages, clearData,graphqlClient,timeOutExecutor} = this.props;
 		this.changeLoadingState();
 		clearData();
 		try {
@@ -81,8 +87,13 @@ class SellingInfo extends Component<props, State> {
 			})).bestSellingProducts;
 			changeFunction(data);
 		} catch (e) {
-			const error = jsonParser(e as string).response.errors[0].message;
-			showMessages({error});
+			const errorFormatted = jsonParser(e as string);
+			if (errorFormatted.response.status === 403) {
+				timeOutExecutor();
+			} else {
+				const error = errorFormatted.response.errors[0].message;
+				showMessages({error});
+			}
 		} finally {
 			this.changeLoadingState();
 		}

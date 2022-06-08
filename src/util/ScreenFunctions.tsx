@@ -7,7 +7,10 @@ import ChangeRoles from "../Components/Inputs/ChangeRoles";
 import SellInput from "../Components/Inputs/SellInput";
 import {messagesInterface, Product, selection} from "../Components/mainScreens/Screen";
 import "../styles/screenFunctions.css";
-import {GraphQLClient}from "graphql-request";
+import {GraphQLClient} from "graphql-request";
+import CheckRoundedIcon from "@mui/icons-material/CheckRounded";
+import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
+
 export function GetTiles(props: { role: string, handler: (e: React.MouseEvent<HTMLButtonElement>) => void }) {
 	const {handler, role} = props;
 	const options = [
@@ -17,7 +20,7 @@ export function GetTiles(props: { role: string, handler: (e: React.MouseEvent<HT
 			onClick={handler}
 			value="0"
 			variant="contained"
-		>search for Product
+		>Get Products
 		</LoadingButton>,
 		<LoadingButton
 			key={"4 - Worker Manger"}
@@ -67,49 +70,96 @@ export function ShowError(props: { messages: messagesInterface }) {
 		return <p className="message">{message}</p>;
 }
 
-export function ShowData(props: { data: Array<Product> }) {
-	const data = props.data;
+function GetClientMassage(props: { quantity: number }) {
+	const quantity = props.quantity;
+	const isAvailable = quantity > 0;
+	if (isAvailable) {
+		return <div className={"clientMassage"}>
+			<h1 className={"availableMassage"}>Available</h1>
+			<CheckRoundedIcon sx={{color: "#18900a"}}/>
+		</div>;
+	}else{
+		return <div className={"clientMassage"}>
+			<h1 className={"soldOutMassage"}>Sold Out</h1>
+			<CloseRoundedIcon sx={{color: "#900a0a"}}/>
+		</div>;
+	}
+}
+
+export function ShowData(props: { data: Array<Product>, role: string }) {
+	const {data, role} = props;
+	const isClient = role === "Client";
 	return <>
 		{data.map((item: Product, key) => {
 			const {name, imgSrc, quantity, numberOfSales} = item;
 			return <div key={key} className={"inner-data-container"}>
-				<img src={imgSrc} alt="image"/>
+				<img src={imgSrc} alt="product image"/>
 				<h1>{name}</h1>
-				<h1>quantity: {quantity}</h1>
-				<h1>sales: {numberOfSales}</h1>
+				{isClient ?
+					<GetClientMassage quantity={quantity}/>
+					: <><h1>quantity: {quantity}</h1>
+						<h1>sales: {numberOfSales}</h1></>}
 			</div>;
 		})}
 	</>;
 }
 
-export function GetContent(props: { select: selection, clear: () => void, graphqlClient: GraphQLClient,showMessages: (messages: messagesInterface) => void, changeFunction: (data: Array<Product>) => void }) {
-	const {select, changeFunction, showMessages, clear,graphqlClient} = props;
+export function GetContent(props: { timeOutExecutor: () => void, select: selection, clear: () => void, graphqlClient: GraphQLClient, showMessages: (messages: messagesInterface) => void, changeFunction: (data: Array<Product>) => void }) {
+	const {select, changeFunction, showMessages, clear, graphqlClient, timeOutExecutor} = props;
 	switch (select) {
 	case selection.search:
 		return <GetProducts
+			timeOutExecutor={timeOutExecutor}
 			graphqlClient={graphqlClient}
 			changeFunction={changeFunction}
 			showMessages={showMessages}
 			clearData={clear}/>;
 	case selection.getList:
 		return <SellingInfo
+			timeOutExecutor={timeOutExecutor}
 			graphqlClient={graphqlClient}
 			changeFunction={changeFunction}
 			showMessages={showMessages}
 			clearData={clear}/>;
 	case selection.addAdjDelProduct:
 		return <ProductModifying
+			timeOutExecutor={timeOutExecutor}
 			graphqlClient={graphqlClient}
 			changeFunction={changeFunction}
 			showMessages={showMessages}
 			clearData={clear}/>;
 	case selection.roles:
-		return <ChangeRoles graphqlClient={graphqlClient} showMessages={showMessages} clearData={clear}/>;
+		return <ChangeRoles
+			timeOutExecutor={timeOutExecutor}
+			graphqlClient={graphqlClient}
+			showMessages={showMessages} clearData={clear}/>;
 	case selection.insertASell:
 		return <SellInput
+			timeOutExecutor={timeOutExecutor}
 			graphqlClient={graphqlClient}
 			changeFunction={changeFunction}
 			showMessages={showMessages}
 			clearData={clear}/>;
 	}
+}
+
+export function TimeOutMassage(props: { logout: () => void }) {
+	const logout = props.logout;
+	return <div className={"TimeOutMassage"}>
+		<div className="TimeOutMassage-inner">
+			<h2>The session is over.</h2>
+			<h2>Please login again.</h2>
+			<LoadingButton
+				onClick={logout}
+				sx={{
+					backgroundColor: "#ff9e37",
+					fontWeight: "bold",
+					color: "#000000",
+					"&:hover": {backgroundColor: "#f8ac5b"}
+				}}
+				variant="contained">
+				LogOUt
+			</LoadingButton>
+		</div>
+	</div>;
 }

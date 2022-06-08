@@ -11,6 +11,7 @@ type State = {
 	isLoading: boolean,
 }
 type props = {
+	timeOutExecutor: () => void,
 	changeFunction: (data: Array<Product>) => void,
 	showMessages: (messages: messagesInterface) => void,
 	clearData: () => void,
@@ -41,7 +42,7 @@ class ModifyProduct extends Component<props, State> {
 	private async fetchData(e: FormEvent<HTMLFormElement>) {
 		e.preventDefault();
 		this.changeLoadingState();
-		const {changeFunction, showMessages, clearData,graphqlClient} = this.props;
+		const {changeFunction, showMessages, clearData,graphqlClient,timeOutExecutor} = this.props;
 		clearData();
 		const oldName: HTMLInputElement = document.querySelector("#nameOfProduct")!;
 		const newName: HTMLInputElement = document.querySelector("#newNameOfProduct")!;
@@ -63,8 +64,13 @@ class ModifyProduct extends Component<props, State> {
 			})).changePropertiesOfProduct;
 			changeFunction([data]);
 		} catch (e) {
-			const error = jsonParser(e as string).response.errors[0].message;
-			showMessages({error});
+			const errorFormatted = jsonParser(e as string);
+			if (errorFormatted.response.status === 403) {
+				timeOutExecutor();
+			} else {
+				const error = errorFormatted.response.errors[0].message;
+				showMessages({error});
+			}
 		} finally {
 			this.changeLoadingState();
 		}

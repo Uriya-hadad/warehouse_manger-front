@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import {FormControlLabel, Radio, RadioGroup, Typography} from "@mui/material";
+import {FormControlLabel, Radio, RadioGroup} from "@mui/material";
 import AddProduct from "../modifyingScreens/AddProduct";
 import DeleteProduct from "../modifyingScreens/DeleteProduct";
 import ModifyProduct from "../modifyingScreens/ModifyProduct";
@@ -14,6 +14,7 @@ type State = {
 }
 
 type props = {
+	timeOutExecutor: () => void
 	changeFunction: (data: Array<Product>) => void,
 	showMessages: (messages: messagesInterface) => void,
 	clearData: () => void,
@@ -52,11 +53,11 @@ class ProductModifying extends Component<props, State> {
 
 	render() {
 		const {addMode, changeMode, deleteMode} = this.state;
-		const {changeFunction,showMessages,clearData,graphqlClient} = this.props;
+		const {changeFunction,showMessages,clearData,graphqlClient,timeOutExecutor} = this.props;
 		return (
 			<>
 				<div className="LoadingButtonsContainer">
-					<h1>Products Modifying</h1>
+					<h1>Product Modifying</h1>
 					<RadioGroup
 						defaultValue="add"
 						name="radio-buttons-group"
@@ -65,14 +66,14 @@ class ProductModifying extends Component<props, State> {
 							className="options"
 							value="add"
 							control={<Radio/>}
-							label={<Typography style={{"fontWeight": "bold"}}>Add</Typography>}
+							label={<span className={"boldText"}>Add</span>}
 							labelPlacement="top"
 							onClick={this.optionsClickHandler.bind(this)}/>
 						<FormControlLabel
 							className="options"
 							value="change"
 							control={<Radio/>}
-							label={<Typography style={{"fontWeight": "bold"}}>Change Props</Typography>}
+							label={<span className={"boldText"}>Change Props</span>}
 							labelPlacement="top"
 							onClick={this.optionsClickHandler.bind(this)}/>
 						<FormControlLabel
@@ -80,12 +81,12 @@ class ProductModifying extends Component<props, State> {
 							onClick={this.optionsClickHandler.bind(this)}
 							value="delete"
 							control={<Radio/>}
-							label={<Typography style={{"fontWeight": "bold"}}>Delete</Typography>}
+							label={<span className={"boldText"}>Delete</span>}
 							labelPlacement="top"/>
 					</RadioGroup>
-					{addMode && <AddProduct graphqlClient={graphqlClient} changeFunction={changeFunction.bind(this)} showMessages ={showMessages.bind(this)} clearData={clearData.bind(this)}/>}
-					{deleteMode && <DeleteProduct graphqlClient={graphqlClient} changeFunction={changeFunction.bind(this)} showMessages ={showMessages.bind(this)} clearData={clearData.bind(this)}/>}
-					{changeMode && <ModifyProduct graphqlClient={graphqlClient} changeFunction={changeFunction.bind(this)} showMessages ={showMessages.bind(this)} clearData={clearData.bind(this)}/>}
+					{addMode && <AddProduct timeOutExecutor={timeOutExecutor} graphqlClient={graphqlClient} changeFunction={changeFunction.bind(this)} showMessages ={showMessages.bind(this)} clearData={clearData.bind(this)}/>}
+					{deleteMode && <DeleteProduct timeOutExecutor={timeOutExecutor} graphqlClient={graphqlClient} changeFunction={changeFunction.bind(this)} showMessages ={showMessages.bind(this)} clearData={clearData.bind(this)}/>}
+					{changeMode && <ModifyProduct timeOutExecutor={timeOutExecutor} graphqlClient={graphqlClient} changeFunction={changeFunction.bind(this)} showMessages ={showMessages.bind(this)} clearData={clearData.bind(this)}/>}
 				</div>
 			</>
 		);

@@ -1,7 +1,7 @@
 import React, {Component, FormEvent} from "react";
 import {TextField} from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
-import SendIcon from "@mui/icons-material/Send";
+import DeleteIcon from "@mui/icons-material/Delete";
 import {gql, GraphQLClient} from "graphql-request";
 import {messagesInterface, Product} from "../mainScreens/Screen";
 import {jsonParser} from "../../util/function";
@@ -11,6 +11,7 @@ type State = {
 	isLoading: boolean,
 }
 type props = {
+	timeOutExecutor: () => void,
 	changeFunction: (data: Array<Product>) => void,
 	showMessages: (messages: messagesInterface) => void,
 	clearData: () => void,
@@ -39,7 +40,7 @@ class DeleteProduct extends Component<props, State> {
 
 	async fetchData(e: FormEvent<HTMLFormElement>) {
 		e.preventDefault();
-		const {changeFunction, showMessages, clearData,graphqlClient} = this.props;
+		const {changeFunction, showMessages, clearData,graphqlClient,timeOutExecutor} = this.props;
 		const name: HTMLInputElement = document.querySelector("#nameOfProduct")!;
 		this.changeLoadingState();
 		clearData();
@@ -52,8 +53,13 @@ class DeleteProduct extends Component<props, State> {
 			data.numberOfSales = "-";
 			changeFunction([data]);
 		} catch (e) {
-			const error = jsonParser(e as string).response.errors[0].message;
-			showMessages({error});
+			const errorFormatted = jsonParser(e as string);
+			if (errorFormatted.response.status === 403) {
+				timeOutExecutor();
+			} else {
+				const error = errorFormatted.response.errors[0].message;
+				showMessages({error});
+			}
 		} finally {
 			this.changeLoadingState();
 		}
@@ -71,7 +77,7 @@ class DeleteProduct extends Component<props, State> {
 				<LoadingButton
 					size="large"
 					type={"submit"}
-					endIcon={<SendIcon/>}
+					endIcon={<DeleteIcon/>}
 					loading={this.state.isLoading}
 					loadingPosition="end"
 					variant="contained">

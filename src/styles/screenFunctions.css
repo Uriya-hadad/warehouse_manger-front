@@ -3,7 +3,7 @@
     font-style: italic;
 }
 
-.error{
+.error {
     color: #81eae7;
 }
 
@@ -17,7 +17,7 @@
     width: 17vh;
 }
 
-.inner-data-container > h1 {
+.inner-data-container h1 {
     font-size: 140%;
 }
 
@@ -32,4 +32,16 @@
     flex-direction: column;
     justify-content: flex-end;
     box-shadow: 0 2px 2px #000000;
+}
+
+.clientMassage {
+    display: flex;
+    align-items: center;
+    gap:3px;
+}
+.availableMassage{
+    color: #18900a
+}
+.soldOutMassage{
+    color: #900a0a
 }

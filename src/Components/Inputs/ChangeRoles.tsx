@@ -18,6 +18,7 @@ type State = {
 }
 
 type props = {
+	timeOutExecutor: () => void
 	showMessages: (messages: messagesInterface) => void,
 	clearData: () => void,
 	graphqlClient:GraphQLClient
@@ -47,7 +48,7 @@ class ChangeRoles extends Component<props, State> {
 
 	async fetchData(e: FormEvent<HTMLFormElement>) {
 		e.preventDefault();
-		const {showMessages, clearData,graphqlClient} = this.props;
+		const {showMessages, clearData,graphqlClient,timeOutExecutor} = this.props;
 		const name: HTMLInputElement = document.querySelector("#NameOfUser")!;
 		const role = this.state.roleChange;
 		this.changeLoadingState();
@@ -59,8 +60,13 @@ class ChangeRoles extends Component<props, State> {
 			const message = `The role "${data.role}" is now assign to ${data.username}`;
 			showMessages({message});
 		} catch (e) {
-			const error = jsonParser(e as string).response.errors[0].message;
-			showMessages({error});
+			const errorFormatted = jsonParser(e as string);
+			if (errorFormatted.response.status === 403) {
+				timeOutExecutor();
+			} else {
+				const error = errorFormatted.response.errors[0].message;
+				showMessages({error});
+			}
 		} finally {
 			this.changeLoadingState();
 		}
