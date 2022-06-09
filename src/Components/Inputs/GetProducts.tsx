@@ -75,7 +75,8 @@ class GetProducts extends Component<props, State> {
 			changeFunction,
 			showMessages,
 			clearData,
-			graphqlClient
+			graphqlClient,
+			timeOutExecutor
 		} = this.props;
 		this.changeLoadingState();
 		const nameOfProduct: HTMLInputElement = document.querySelector("#nameOfProduct")!;
@@ -87,8 +88,12 @@ class GetProducts extends Component<props, State> {
 			changeFunction(data.searchForProducts);
 		} catch (e) {
 			const errorFormatted = jsonParser(e as string);
-			const error = errorFormatted.response.errors[0].message;
-			showMessages({error});
+			if (errorFormatted.response.status === 403) {
+				timeOutExecutor();
+			} else {
+				const error = errorFormatted.response.errors[0].message;
+				showMessages({error});
+			}
 		} finally {
 			this.changeLoadingState();
 		}
