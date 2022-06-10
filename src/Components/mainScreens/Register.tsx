@@ -56,7 +56,7 @@ class Register extends Component<props, MyState> {
 				password: password
 			})).register;
 			this.setState({massage: data});
-			setTimeout(changeState, 2000);
+			setTimeout(changeState, 700);
 		} catch (e) {
 			const error = jsonParser(e as string).response.errors[0].message;
 			this.setState({massage: error});
