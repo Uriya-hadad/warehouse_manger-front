@@ -11,22 +11,35 @@ type State = {
 	value: string
 }
 type props = {
+	role: string,
 	timeOutExecutor: () => void
 	changeFunction: (data: Array<Product>) => void,
 	showMessages: (messages: messagesInterface) => void,
 	clearData: () => void,
 	graphqlClient: GraphQLClient
 }
-const allQuery = gql`
+const getProductsMangerQuery = gql`
 					{
 						getAllProducts{
 						name, imgSrc,quantity,numberOfSales
 						}
 					}`;
-const oneQuery = gql`
+const getProductMangerQuery = gql`
              query searchForProducts($name: String!){
                 searchForProducts(name:$name){
                 name, imgSrc,quantity,numberOfSales
+                }
+         		 }`;
+const getProductsClientWorkerQuery = gql`
+					{
+						getAllProducts{
+						name, imgSrc,quantity
+						}
+					}`;
+const getProductClientWorkerQuery = gql`
+             query searchForProducts($name: String!){
+                searchForProducts(name:$name){
+                name, imgSrc,quantity
                 }
          		 }`;
 
@@ -50,12 +63,15 @@ class GetProducts extends Component<props, State> {
 			showMessages,
 			clearData,
 			graphqlClient,
-			timeOutExecutor
+			timeOutExecutor,
+			role
 		} = this.props;
 		this.changeLoadingState();
 		clearData();
 		try {
-			const data = (await graphqlClient.request(allQuery)).getAllProducts;
+			const isManger = role === "Manger";
+			const query = isManger? getProductsMangerQuery: getProductsClientWorkerQuery
+			const data = (await graphqlClient.request(query)).getAllProducts;
 			changeFunction(data);
 		} catch (e) {
 			const errorFormatted = jsonParser(e as string);
@@ -76,13 +92,16 @@ class GetProducts extends Component<props, State> {
 			showMessages,
 			clearData,
 			graphqlClient,
-			timeOutExecutor
+			timeOutExecutor,
+			role
 		} = this.props;
 		this.changeLoadingState();
 		const nameOfProduct: HTMLInputElement = document.querySelector("#nameOfProduct")!;
 		clearData();
 		try {
-			const data = (await graphqlClient.request(oneQuery, {
+			const isManger = role === "Manger";
+			const query = isManger? getProductMangerQuery: getProductClientWorkerQuery
+			const data = (await graphqlClient.request(query, {
 				name: nameOfProduct.value
 			}));
 			changeFunction(data.searchForProducts);

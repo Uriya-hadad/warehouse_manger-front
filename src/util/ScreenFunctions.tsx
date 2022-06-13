@@ -89,6 +89,7 @@ function GetClientMassage(props: { quantity: number }) {
 export function ShowData(props: { data: Array<Product>, role: string }) {
 	const {data, role} = props;
 	const isClient = role === "Client";
+	const isWorker = role === "Worker";
 	return <>
 		{data.map((item: Product, key) => {
 			const {name, imgSrc, quantity, numberOfSales} = item;
@@ -97,18 +98,20 @@ export function ShowData(props: { data: Array<Product>, role: string }) {
 				<h1>{name}</h1>
 				{isClient ?
 					<GetClientMassage quantity={quantity}/>
-					: <><h1>quantity: {quantity}</h1>
-						<h1>sales: {numberOfSales}</h1></>}
+					: (isWorker?(<h1>quantity: {quantity}</h1>):
+						(<><h1>quantity: {quantity}</h1>
+						<h1>sales: {numberOfSales}</h1></>))}
 			</div>;
 		})}
 	</>;
 }
 
-export function GetContent(props: { timeOutExecutor: () => void, select: selection, clear: () => void, graphqlClient: GraphQLClient, showMessages: (messages: messagesInterface) => void, changeFunction: (data: Array<Product>) => void }) {
-	const {select, changeFunction, showMessages, clear, graphqlClient, timeOutExecutor} = props;
+export function GetContent(props: { role: string ,timeOutExecutor: () => void, select: selection, clear: () => void, graphqlClient: GraphQLClient, showMessages: (messages: messagesInterface) => void, changeFunction: (data: Array<Product>) => void }) {
+	const {select, changeFunction, showMessages, clear, graphqlClient, timeOutExecutor,role} = props;
 	switch (select) {
 	case selection.search:
 		return <GetProducts
+			role={role}
 			timeOutExecutor={timeOutExecutor}
 			graphqlClient={graphqlClient}
 			changeFunction={changeFunction}

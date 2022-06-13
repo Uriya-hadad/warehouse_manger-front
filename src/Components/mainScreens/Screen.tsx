@@ -123,6 +123,7 @@ export default class Screen extends Component<Props, State> {
 			</div>
 			<GetTiles role={role} handler={this.selectHandlerAndHideData.bind(this)}/>
 			<GetContent
+				role={role}
 				timeOutExecutor={this.TimeOut.bind(this)}
 				select={this.state.select}
 				changeFunction={this.changeStateData.bind(this)}
