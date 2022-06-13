@@ -100,7 +100,7 @@ export function ShowData(props: { data: Array<Product>, role: string }) {
 					<GetClientMassage quantity={quantity}/>
 					: (isWorker?(<h1>quantity: {quantity}</h1>):
 						(<><h1>quantity: {quantity}</h1>
-						<h1>sales: {numberOfSales}</h1></>))}
+							<h1>sales: {numberOfSales}</h1></>))}
 			</div>;
 		})}
 	</>;

@@ -70,7 +70,7 @@ class GetProducts extends Component<props, State> {
 		clearData();
 		try {
 			const isManger = role === "Manger";
-			const query = isManger? getProductsMangerQuery: getProductsClientWorkerQuery
+			const query = isManger? getProductsMangerQuery: getProductsClientWorkerQuery;
 			const data = (await graphqlClient.request(query)).getAllProducts;
 			changeFunction(data);
 		} catch (e) {
@@ -100,7 +100,7 @@ class GetProducts extends Component<props, State> {
 		clearData();
 		try {
 			const isManger = role === "Manger";
-			const query = isManger? getProductMangerQuery: getProductClientWorkerQuery
+			const query = isManger? getProductMangerQuery: getProductClientWorkerQuery;
 			const data = (await graphqlClient.request(query, {
 				name: nameOfProduct.value
 			}));
