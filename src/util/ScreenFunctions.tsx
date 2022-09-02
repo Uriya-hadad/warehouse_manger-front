@@ -161,7 +161,7 @@ export function TimeOutMassage(props: { logout: () => void }) {
 					"&:hover": {backgroundColor: "#f8ac5b"}
 				}}
 				variant="contained">
-				LogOUt
+				Reconnect
 			</LoadingButton>
 		</div>
 	</div>;
