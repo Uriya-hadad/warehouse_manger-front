@@ -20,8 +20,9 @@ type props = {
 }
 
 const registrationQuery = gql`
-          mutation register($username: String!,$password: String!){
+          mutation register($username: String!, $email: String!, $password: String!){
                 register(username:$username
+                			  email:$email
                               password:$password)
           }
         `;
@@ -46,6 +47,7 @@ class Register extends Component<props, MyState> {
 		e.preventDefault();
 		const {password, repeatPassword} = this.state;
 		const username: HTMLInputElement = document.querySelector("#username")!;
+		const email: HTMLInputElement = document.querySelector("#email")!;
 		if (repeatPassword !== password) {
 			this.changeLoadingState();
 			return this.setState({massage: "Enter the same password"});
@@ -53,6 +55,7 @@ class Register extends Component<props, MyState> {
 		try {
 			const data = (await graphqlClient.request(registrationQuery, {
 				username: username.value,
+				email: email.value,
 				password: password
 			})).register;
 			this.setState({massage: data});
@@ -86,6 +89,14 @@ class Register extends Component<props, MyState> {
 				id="username"
 				color="success"
 				type="text"
+				variant="standard"/>
+			<TextField
+				required
+				placeholder="Email"
+				className="register-input"
+				id="email"
+				color="success"
+				type="email"
 				variant="standard"/>
 			<TextField
 				required
