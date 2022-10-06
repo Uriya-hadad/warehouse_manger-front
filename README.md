@@ -3,6 +3,9 @@
 and remote manner with the compartmentalization of system users according to 
 their roles.</p>
 <p>In addition, exposing an endpoint for querying products from the warehouse without the need to connect to the system</p>
+
+<h2>Roles</h2>
+<hr>
 <p>
 All employees and clients are divided into three roles:
 </p>
@@ -25,5 +28,13 @@ existing product.</li><li>Get information on the best/worst selling products.
 </li><li>Change role for system user.
 </li></ol>
 
+<h2>Features list</h2>
+<hr>
+<ul>
+<li>Email confirmation 07/10/22</li>
+</ul>
+
+<br>
 live: https://warehouse-staff.herokuapp.com/
 <p>(The site is working as of 03/06/22)</p>
+
