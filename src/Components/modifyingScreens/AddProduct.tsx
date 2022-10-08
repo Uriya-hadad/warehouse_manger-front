@@ -21,7 +21,7 @@ type props = {
 const addProductQuery = gql`
              mutation addAnProduct($name: String!,$imgSrc:String!,$quantity:Int!){
 			 	addAnProduct(name:$name,imgSrc:$imgSrc,quantity:$quantity){
-                	name, imgSrc,quantity,numberOfSales
+                	name, imgSrc,quantity
                 }
 			 }`;
 

@@ -1,6 +1,7 @@
 import React, {Component, FormEvent} from "react";
 import "../../styles/login.css";
-import {gql, GraphQLClient
+import {
+	gql, GraphQLClient
 } from "graphql-request";
 import {TextField} from "@mui/material";
 import LoginIcon from "@mui/icons-material/Login";
@@ -15,7 +16,8 @@ type State = {
 
 type props = {
 	setToken: (token: string | undefined) => void,
-	graphqlClient:GraphQLClient
+	forgetPasswordChangeState: () => void,
+	graphqlClient: GraphQLClient
 };
 
 const loginQuery = gql`
@@ -42,37 +44,44 @@ export class Login extends Component<props, State> {
 	private async fetchRequest(e: FormEvent<HTMLFormElement>) {
 		e.preventDefault();
 		this.setState({massage: undefined});
-		const {setToken,graphqlClient} = this.props;
+		const {setToken, graphqlClient} = this.props;
 		this.changeLoadingState();
 		const username: HTMLInputElement = document.querySelector("#username")!;
 		const password: HTMLInputElement = document.querySelector("#password")!;
 		try {
-			const data = (await graphqlClient.request( loginQuery, {
+			const data = (await graphqlClient.request(loginQuery, {
 				username: username.value,
 				password: password.value
 			})).login;
 			setToken(data);
 		} catch (e) {
-			const error = jsonParser(e as string).response.errors[0].message;
-			this.setState({massage: error});
+			const text = jsonParser(e as string).response.errors[0].message;
+			this.displayMassage(text);
 		} finally {
 			this.changeLoadingState();
 		}
 	}
 
+	private displayMassage(text: string) {
+		this.setState({massage: text});
+		setTimeout(() => {
+			this.setState({massage: undefined});
+		}, 2500);}
+
 	render() {
 		const {massage, isLoading} = this.state;
 		return <form className="login-container" onSubmit={this.fetchRequest.bind(this)}>
-			<h1 className="login-title">Login</h1>
+			<h1 className="large-title">Login</h1>
 			<TextField
+				required
 				placeholder="Username"
 				className="login-input"
 				id="username"
 				color="success"
 				type="text"
 				variant="standard"/>
-
 			<TextField
+				required
 				color="success"
 				placeholder="Password"
 				className="login-input"
@@ -80,17 +89,21 @@ export class Login extends Component<props, State> {
 				id="password"
 				type="password"
 				variant="standard"/>
-			<LoadingButton
-				disableElevation
-				variant="contained"
-				id="login-submit"
-				loading={isLoading}
-				color="success"
-				size="large"
-				endIcon={<LoginIcon/>}
-				type="submit">Sign
-				in
-			</LoadingButton>
+			<div className="login-forget-container">
+				<LoadingButton
+					disableElevation
+					variant="contained"
+					id="login-submit"
+					loading={isLoading}
+					color="success"
+					size="large"
+					endIcon={<LoginIcon/>}
+					type="submit">Sign
+					in
+				</LoadingButton>
+				<a href="#" id="linksLabel" onClick={this.props.forgetPasswordChangeState}>Forget
+					Password?</a>
+			</div>
 			{massage && <h3>{massage}</h3>}
 		</form>;
 	}

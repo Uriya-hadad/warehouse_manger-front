@@ -78,7 +78,7 @@ function GetClientMassage(props: { quantity: number }) {
 			<h1 className={"availableMassage"}>Available</h1>
 			<CheckRoundedIcon sx={{color: "#18900a"}}/>
 		</div>;
-	}else{
+	} else {
 		return <div className={"clientMassage"}>
 			<h1 className={"soldOutMassage"}>Sold Out</h1>
 			<CloseRoundedIcon sx={{color: "#900a0a"}}/>
@@ -89,7 +89,7 @@ function GetClientMassage(props: { quantity: number }) {
 export function ShowData(props: { data: Array<Product>, role: string }) {
 	const {data, role} = props;
 	const isClient = role === "Client";
-	const isWorker = role === "Worker";
+	const isManger = role === "Manger";
 	return <>
 		{data.map((item: Product, key) => {
 			const {name, imgSrc, quantity, numberOfSales} = item;
@@ -98,16 +98,24 @@ export function ShowData(props: { data: Array<Product>, role: string }) {
 				<h1>{name}</h1>
 				{isClient ?
 					<GetClientMassage quantity={quantity}/>
-					: (isWorker?(<h1>quantity: {quantity}</h1>):
-						(<><h1>quantity: {quantity}</h1>
-							<h1>sales: {numberOfSales}</h1></>))}
+					: <><h1>quantity: {quantity}</h1>
+						{isManger && numberOfSales !== undefined && <h1>sales: {numberOfSales}</h1>}
+					</>}
 			</div>;
 		})}
 	</>;
 }
 
-export function GetContent(props: { role: string ,timeOutExecutor: () => void, select: selection, clear: () => void, graphqlClient: GraphQLClient, showMessages: (messages: messagesInterface) => void, changeFunction: (data: Array<Product>) => void }) {
-	const {select, changeFunction, showMessages, clear, graphqlClient, timeOutExecutor,role} = props;
+export function GetContent(props: { role: string, timeOutExecutor: () => void, select: selection, clear: () => void, graphqlClient: GraphQLClient, showMessages: (messages: messagesInterface) => void, changeFunction: (data: Array<Product>) => void }) {
+	const {
+		select,
+		changeFunction,
+		showMessages,
+		clear,
+		graphqlClient,
+		timeOutExecutor,
+		role
+	} = props;
 	switch (select) {
 	case selection.search:
 		return <GetProducts

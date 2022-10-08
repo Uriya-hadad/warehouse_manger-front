@@ -2,10 +2,7 @@
 .register-input{
     font-size: 12px;
 }
-.register-title{
-    font-size: 4rem;
-    margin:20px;
-}
+
 .register-container{
     display: flex;
     flex-direction: column;
