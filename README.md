@@ -32,6 +32,8 @@ existing product.</li><li>Get information on the best/worst selling products.
 <hr>
 <ul>
 <li>Email confirmation 07/10/22</li>
+<li>Forget password flow 09/10/22</li>
+
 </ul>
 
 <br>
