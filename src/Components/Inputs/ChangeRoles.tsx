@@ -25,8 +25,8 @@ type props = {
 }
 
 const changeRoleQuery = gql`
-             mutation changeRole($name: String!,$role: String!){
-                changeRole(username:$name,reqRole:$role){
+             mutation changeRole($email: String!,$role: String!){
+                changeRole(email:$email,reqRole:$role){
                 username,role
                 }
          		 }`;
