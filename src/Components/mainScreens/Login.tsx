@@ -21,9 +21,9 @@ type props = {
 };
 
 const loginQuery = gql`
-          mutation login($username: String!
+          mutation login($email: String!
                           $password: String!){
-                login(username:$username
+                login(email:$email
                               password:$password)
           }
         `;
@@ -46,11 +46,11 @@ export class Login extends Component<props, State> {
 		this.setState({massage: undefined});
 		const {setToken, graphqlClient} = this.props;
 		this.changeLoadingState();
-		const username: HTMLInputElement = document.querySelector("#username")!;
+		const email: HTMLInputElement = document.querySelector("#email")!;
 		const password: HTMLInputElement = document.querySelector("#password")!;
 		try {
 			const data = (await graphqlClient.request(loginQuery, {
-				username: username.value,
+				email: email.value,
 				password: password.value
 			})).login;
 			setToken(data);
@@ -74,9 +74,9 @@ export class Login extends Component<props, State> {
 			<h1 className="large-title">Login</h1>
 			<TextField
 				required
-				placeholder="Username"
+				placeholder="Email"
 				className="login-input"
-				id="username"
+				id="email"
 				color="success"
 				type="text"
 				variant="standard"/>

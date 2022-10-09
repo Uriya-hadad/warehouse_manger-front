@@ -21,7 +21,7 @@ type props = {
 	timeOutExecutor: () => void
 	showMessages: (messages: messagesInterface) => void,
 	clearData: () => void,
-	graphqlClient:GraphQLClient
+	graphqlClient: GraphQLClient
 }
 
 const changeRoleQuery = gql`
@@ -48,14 +48,15 @@ class ChangeRoles extends Component<props, State> {
 
 	async fetchData(e: FormEvent<HTMLFormElement>) {
 		e.preventDefault();
-		const {showMessages, clearData,graphqlClient,timeOutExecutor} = this.props;
-		const name: HTMLInputElement = document.querySelector("#NameOfUser")!;
+		const {showMessages, clearData, graphqlClient, timeOutExecutor} = this.props;
+		const email: HTMLInputElement = document.querySelector("#EmailOfUser")!;
 		const role = this.state.roleChange;
 		this.changeLoadingState();
 		clearData();
 		try {
-			const data = (await graphqlClient.request( changeRoleQuery, {
-				name: name.value, role
+			const data = (await graphqlClient.request(changeRoleQuery, {
+				email: email.value,
+				role
 			})).changeRole;
 			const message = `The role "${data.role}" is now assign to ${data.username}`;
 			showMessages({message});
@@ -85,8 +86,8 @@ class ChangeRoles extends Component<props, State> {
 					<TextField
 						required
 						autoComplete={"off"}
-						id="NameOfUser"
-						label="Name Of User"
+						id="EmailOfUser"
+						label="Email Of User"
 						variant="filled"/>
 					<FormControl sx={{m: 2, minWidth: 120}}>
 						<Select

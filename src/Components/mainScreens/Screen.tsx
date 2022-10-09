@@ -110,7 +110,7 @@ export default class Screen extends Component<Props, State> {
 
 	render() {
 		const {data, messages, role, username, graphqlClient, timeout} = this.state;
-		const usernameFormatted = username.charAt(0).toUpperCase() + username.slice(1).toLowerCase();
+		const usernameFormatted = username.charAt(0).toUpperCase() + username.slice(1);
 		return <div className="ScreensContainer">
 			<div className={"nameTitleContainer"}>
 				<h1 className={"nameTitle"}>Hi {usernameFormatted}!</h1>
