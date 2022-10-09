@@ -88,6 +88,7 @@ class ChangeRoles extends Component<props, State> {
 						autoComplete={"off"}
 						id="EmailOfUser"
 						label="Email Of User"
+						type="email"
 						variant="filled"/>
 					<FormControl sx={{m: 2, minWidth: 120}}>
 						<Select
