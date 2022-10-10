@@ -66,7 +66,8 @@ export class Login extends Component<props, State> {
 		this.setState({massage: text});
 		setTimeout(() => {
 			this.setState({massage: undefined});
-		}, 2500);}
+		}, 2500);
+	}
 
 	render() {
 		const {massage, isLoading} = this.state;
@@ -78,7 +79,7 @@ export class Login extends Component<props, State> {
 				className="login-input"
 				id="email"
 				color="success"
-				type="text"
+				type="email"
 				variant="standard"/>
 			<TextField
 				required

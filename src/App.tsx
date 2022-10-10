@@ -34,13 +34,18 @@ class App extends React.Component<Record<string, never>, MyState> {
 	render() {
 		const {token} = this.state;
 		return <>
-			<Routes>
-				<Route path="/" element={token ?
-					<Screen setToken={this.setToken.bind(this)} token={token}/> :
-					<LoginRegisterScreen setToken={this.setToken.bind(this)}/>}/>
-				<Route path="/reset/:id" element={<PassPramsWorkAround/>}/>
-				<Route path="*" element={<PageNotFound/>}/>
-			</Routes>
+			<div id="logo">
+				<img src="https://www.logodesign.net/logo/line-art-house-roof-and-buildings-4485ld.png" alt="logo"/>
+			</div>
+			<div id="app-div">
+				<Routes>
+					<Route path="/" element={token ?
+						<Screen setToken={this.setToken.bind(this)} token={token}/> :
+						<LoginRegisterScreen setToken={this.setToken.bind(this)}/>}/>
+					<Route path="/reset/:id" element={<PassPramsWorkAround/>}/>
+					<Route path="*" element={<PageNotFound/>}/>
+				</Routes>
+			</div>
 		</>;
 	}
 }

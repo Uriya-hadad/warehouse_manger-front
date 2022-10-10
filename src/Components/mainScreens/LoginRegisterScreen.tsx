@@ -38,14 +38,14 @@ class LoginRegisterScreen extends React.Component<props, MyState> {
 
 		let currentScreen;
 		if (!isLogin) {
-			currentScreen =< Register
+			currentScreen = < Register
 				graphqlClient={graphqlClient}
 				changeState={this.registerHandler.bind(this)}/>;
-		}else if (isForgetPassword) {
+		} else if (isForgetPassword) {
 			currentScreen = <ForgetPassword
 				forgetPasswordChangeState={this.forgetPasswordChangeState.bind(this)}
 				graphqlClient={graphqlClient}/>;
-		}else {
+		} else {
 			currentScreen = <Login
 				graphqlClient={graphqlClient}
 				setToken={setToken}

@@ -1,11 +1,13 @@
 import React, {Component, FormEvent} from "react";
-import {FormControlLabel, Radio, RadioGroup, Slider} from "@mui/material";
+import {Button, FormControlLabel, Radio, RadioGroup, Slider} from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
 import SendIcon from "@mui/icons-material/Send";
 import {gql, GraphQLClient} from "graphql-request";
 import "../../styles/SellingInfo.css";
 import {messagesInterface, Product} from "../mainScreens/Screen";
 import {jsonParser} from "../../util/function";
+import {utils, writeFile} from "xlsx";
+import FileDownloadIcon from "@mui/icons-material/FileDownload";
 
 
 type State = {
@@ -19,7 +21,7 @@ type props = {
 	changeFunction: (data: Array<Product>) => void,
 	showMessages: (messages: messagesInterface) => void,
 	clearData: () => void,
-	graphqlClient:GraphQLClient
+	graphqlClient: GraphQLClient
 }
 
 const worstListQuery = gql`
@@ -34,7 +36,6 @@ const bestListQuery = gql`
                 				name, imgSrc,quantity,numberOfSales
                 			}
         			 }`;
-
 
 class SellingInfo extends Component<props, State> {
 
@@ -53,74 +54,74 @@ class SellingInfo extends Component<props, State> {
 		this.setState(prevState => ({isLoading: !prevState.isLoading}));
 	}
 
-	async getWorstList() {
-		const limitValue = this.state.limitValue;
-		const {changeFunction, showMessages, clearData,graphqlClient,timeOutExecutor} = this.props;
-		this.changeLoadingState();
-		clearData();
-		try {
-			const data = (await graphqlClient.request( worstListQuery, {
-				limit: limitValue
-			})).worstSellingProducts;
-			changeFunction(data);
-		} catch (e) {
-			const errorFormatted = jsonParser(e as string);
-			if (errorFormatted.response.status === 403) {
-				timeOutExecutor();
-			} else {
-				const error = errorFormatted.response.errors[0].message;
-				showMessages({error});
-			}
-		} finally {
-			this.changeLoadingState();
-		}
+	async exportToExcel() {
+		let data = await this.fetchData();
+		data = data.map((product: Product) => {
+			return {
+				"Name of product": product.name,
+				"Quantity": product.quantity,
+				"Number of Sales": product.numberOfSales,
+				"Image url": product.imgSrc
+			};
+		});
+		const sheet = utils.json_to_sheet(data);
+		const book = utils.book_new();
+		utils.book_append_sheet(book, sheet, "Selling Info");
+		writeFile(book, "Products.xlsx");
 	}
 
-	async getBestList() {
-		const limitValue = this.state.limitValue;
-		const {changeFunction, showMessages, clearData,graphqlClient,timeOutExecutor} = this.props;
-		this.changeLoadingState();
-		clearData();
-		try {
-			const data = (await graphqlClient.request( bestListQuery, {
-				limit: limitValue
-			})).bestSellingProducts;
-			changeFunction(data);
-		} catch (e) {
-			const errorFormatted = jsonParser(e as string);
-			if (errorFormatted.response.status === 403) {
-				timeOutExecutor();
-			} else {
-				const error = errorFormatted.response.errors[0].message;
-				showMessages({error});
-			}
-		} finally {
-			this.changeLoadingState();
-		}
-	}
-
-	async fetchData(e: FormEvent<HTMLFormElement>) {
-		e.preventDefault();
+	async getList(event: FormEvent<HTMLFormElement>) {
+		event.preventDefault();
+		const {changeFunction} = this.props;
 		(document.querySelector(".data-container") as HTMLDivElement)!.style.display = "none";
-		const choice = this.state.choice;
-		if (choice == "best") await this.getBestList();
-		if (choice == "worst") await this.getWorstList();
+		this.changeLoadingState();
+		const data = await this.fetchData();
+		this.changeLoadingState();
+		changeFunction(data);
 	}
 
-	getChoice(event: React.MouseEvent<HTMLLabelElement>) {
+	async fetchData() {
+		const {limitValue, choice} = this.state;
+		const variables = {limit: limitValue};
+		let data;
+		const {
+			showMessages,
+			graphqlClient,
+			timeOutExecutor
+		} = this.props;
+		try {
+			if (choice === "best") {
+				data = (await graphqlClient.request(bestListQuery, variables)).bestSellingProducts;
+			} else if (choice === "worst") {
+				data = (await graphqlClient.request(worstListQuery, variables)).worstSellingProducts;
+			}
+			return data;
+		} catch (e) {
+			const errorFormatted = jsonParser(e as string);
+			if (errorFormatted.response.status === 403) {
+				timeOutExecutor();
+			} else {
+				const error = errorFormatted.response.errors[0].message;
+				showMessages({error});
+			}
+		}
+	}
+
+	setChoice(event: React.MouseEvent<HTMLLabelElement>) {
 		const choice = (event.target as HTMLInputElement).value;
 		this.setState({choice});
 	}
 
+	setLimit(event: Event, limitValue: number | number[]) {
+		if (typeof limitValue === "number") {
+			this.setState({limitValue});
+		}
+	}
+
 	render() {
-		const handleChange = (event: Event, limitValue: number | number[]) => {
-			if (typeof limitValue === "number") {
-				this.setState({limitValue});
-			}
-		};
 		const isLoading = this.state.isLoading;
 		return (
-			<form onSubmit={this.fetchData.bind(this)} className="LoadingButtonsContainer">
+			<form onSubmit={this.getList.bind(this)} className="LoadingButtonsContainer">
 				<h1>Sale Information</h1>
 				<RadioGroup
 					defaultValue="best"
@@ -130,13 +131,13 @@ class SellingInfo extends Component<props, State> {
 						value="best"
 						control={<Radio/>}
 						label={<span className={"boldText"}>Best</span>}
-						onClick={this.getChoice.bind(this)}/>
+						onClick={this.setChoice.bind(this)}/>
 					<FormControlLabel
 						className={"listOptionButton"}
 						value="worst"
 						control={<Radio/>}
 						label={<span className={"boldText"}>Worst</span>}
-						onClick={this.getChoice.bind(this)}/>
+						onClick={this.setChoice.bind(this)}/>
 				</RadioGroup>
 				<span className={"boldText"}>
 						Limit result by: {this.state.limitValue}
@@ -146,7 +147,7 @@ class SellingInfo extends Component<props, State> {
 					defaultValue={5}
 					valueLabelDisplay="on"
 					step={1}
-					onChange={handleChange}
+					onChange={this.setLimit.bind(this)}
 					min={5}
 					max={30}
 				/>
@@ -159,6 +160,17 @@ class SellingInfo extends Component<props, State> {
 					variant="contained">
 					Get sales info
 				</LoadingButton>
+				<Button
+					endIcon={<FileDownloadIcon/>}
+					sx={{
+						color: "rgb(3,117,67)",
+						fontWeight: "bold",
+					}}
+					variant="outlined"
+					color="success"
+					onClick={this.exportToExcel.bind(this)}>
+					Export to Excel
+				</Button>
 			</form>
 		);
 	}
