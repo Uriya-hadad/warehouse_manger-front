@@ -14,7 +14,7 @@
 
 
 .inner-data-container > img {
-    width: 17vh;
+    width: 160px;
 }
 
 .inner-data-container h1 {
@@ -26,7 +26,7 @@
     border: 1px solid #000000;
     background-color: #ffffff;
     border-radius: 6px;
-    width: 20vh;
+    width: 190px;
     padding: 10px;
     display: flex;
     flex-direction: column;
