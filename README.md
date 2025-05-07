@@ -37,6 +37,6 @@ existing product.</li><li>Get information on the best/worst selling products.
 </ul>
 
 <br>
-live: https://warehouse-staff.herokuapp.com/
+live: [Demo](https://warehouse-staff-front.cfapps.sap.hana.ondemand.com/#)
 <p>(The site is working as of 03/06/22)</p>
 
